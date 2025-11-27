@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compete Plus - Acessar Conta</title>
+    
+    <!-- Fontes do Projeto: Poppins e Merriweather -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS (usado para classes utilitárias e responsividade) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        /* --- Variáveis de Cor da Identidade Visual Compete+ --- */
+        :root {
+            --primary-blue: #1a1054; /* Azul Forte */
+            --light-blue: #255ff1;  /* Azul Claro */
+            --accent-green: #10B981; /* Verde Ação (Botões) */
+            --accent-orange: #F59E0B; /* Laranja (Logo/Destaque) */
+            --text-white: #ffffff;
+            --text-dark: #1F2937;
+            --card-bg: #ffffff;
+            --border-radius: 16px;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            /* Aplicando o mesmo gradiente do fundo da página principal */
+            background: linear-gradient(45deg, var(--primary-blue), var(--light-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* --- Estilo do Card de Login --- */
+        .login-card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            /* Sombra profunda para destacar no fundo escuro */
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3), 0 0 0 4px rgba(25, 95, 241, 0.1); /* Sombra + Brilho sutil do azul */
+            transition: all 0.3s ease;
+        }
+
+        /* --- Logo --- */
+        .logo-text {
+            font-size: 2.25rem; /* text-4xl */
+            font-weight: 800;
+            color: var(--primary-blue);
+        }
+
+        .logo-plus {
+            color: var(--accent-orange);
+            font-weight: 900;
+        }
+
+        /* --- Inputs e Ícones --- */
+        .input-field {
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding-left: 40px;
+            transition: all 0.2s;
+            color: var(--text-dark);
+        }
+
+        .input-field:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(26, 16, 84, 0.2);
+            outline: none;
+        }
+        
+        .icon-svg {
+            color: var(--primary-blue);
+            opacity: 0.6;
+        }
+
+        /* --- Botão de Ação (Login) --- */
+        .btn-login {
+            /* Usando o verde de destaque como cor de ação principal */
+            background-color: var(--accent-green);
+            color: white;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: background-color 0.2s, transform 0.2s;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-login:hover {
+            background-color: #059669; /* Verde mais escuro no hover */
+            transform: translateY(-1px);
+        }
+        
+        /* NOVO: Estilo para Botão Desabilitado (Acessando...) */
+        .btn-login:disabled {
+            background-color: #059669; /* Usa o hover color como base para manter o tema */
+            color: rgba(255, 255, 255, 0.7); /* Texto mais claro */
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            opacity: 1; /* Garante que o CSS controle a cor, e não o JS ou o navegador */
+        }
+
+        /* --- Links --- */
+        .brand-link {
+            color: var(--primary-blue);
+            font-weight: 600;
+        }
+        
+        .brand-link:hover {
+            color: var(--light-blue);
+        }
+    </style>
+</head>
+<body class="p-4">
+
+    <div class="login-card w-full max-w-md p-6 sm:p-10">
+        <!-- Cabeçalho e Logo -->
+        <div class="text-center mb-8 sm:mb-10">
+            <div class="logo-text mb-2">
+                <a href="./index.html">
+                Compete<span class="logo-plus">+</span>
+                </a>
+            </div>
+            <h1 class="text-2xl font-semibold text-gray-800">Acesse sua Conta</h1>
+            <p class="text-sm text-gray-500 mt-1">Insira seus dados para entrar na plataforma.</p>
+        </div>
+
+        <form id="loginForm" class="space-y-6">
+            <!-- Campo de Email -->
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
+                <div class="relative">
+                    <!-- Ícone de E-mail (Inline SVG) -->
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 icon-svg" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                    </div>
+                    <input type="email" id="email" name="email" required placeholder="seu.email@exemplo.com"
+                           class="w-full py-3 input-field"
+                           aria-describedby="email-help">
+                </div>
+            </div>
+
+            <!-- Campo de Senha -->
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+                <div class="relative">
+                    <!-- Ícone de Senha/Cadeado -->
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 icon-svg" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    </div>
+                    <input type="password" id="password" name="password" required placeholder="Mínimo 6 caracteres"
+                           class="w-full py-3 input-field">
+                </div>
+                <div class="mt-2 text-right">
+                    <a href="#" class="text-sm font-medium brand-link hover:text-light-blue transition duration-150 ease-in-out">
+                        Esqueceu sua senha?
+                    </a>
+                </div>
+            </div>
+
+            <!-- Área de Mensagem (Feedback) -->
+            <div id="messageBox" class="hidden p-3 rounded-lg text-sm font-medium" role="alert">
+                <p id="messageText"></p>
+            </div>
+
+            <!-- Botão de Login -->
+            <div>
+                <button type="submit" id="loginButton"
+                        class="btn-login w-full py-3 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-400">
+                    Entrar
+                </button>
+            </div>
+        </form>
+
+        <!-- Link para Cadastro -->
+        <div class="mt-8 text-center text-sm text-gray-600">
+            Não tem uma conta?
+            <!-- LINK ATUALIZADO para a nova página de cadastro -->
+            <a href="cadastro.html" class="brand-link">
+                Crie uma agora
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // O código JavaScript abaixo simula o processo de login.
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('loginForm');
+            const messageBox = document.getElementById('messageBox');
+            const messageText = document.getElementById('messageText');
+            const loginButton = document.getElementById('loginButton');
+
+            // Função para exibir mensagens (erro ou sucesso)
+            function showMessage(text, isError = true) {
+                messageText.textContent = text;
+                messageBox.classList.remove('hidden', 'bg-red-100', 'bg-green-100', 'border-red-400', 'border-green-400', 'text-red-700', 'text-green-700');
+                
+                // Estilo da caixa de mensagem de acordo com o tipo
+                if (isError) {
+                    messageBox.classList.add('bg-red-100', 'border', 'border-red-400', 'text-red-700');
+                } else {
+                    messageBox.classList.add('bg-green-100', 'border', 'border-green-400', 'text-green-700');
+                }
+                
+                messageBox.classList.remove('hidden');
+                
+                // Oculta a mensagem após 5 segundos
+                setTimeout(() => {
+                    messageBox.classList.add('hidden');
+                }, 5000);
+            }
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+                
+                // Desabilitar botão e mostrar loading
+                loginButton.disabled = true;
+                loginButton.textContent = 'Acessando...';
+                
+                // 1. Validação de formato (Email e Senha mínima)
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email) || password.length < 6) {
+                    let errorMessage = '';
+                    if (!emailRegex.test(email)) {
+                        errorMessage = 'O formato do e-mail é inválido.';
+                    } else if (password.length < 6) {
+                        errorMessage = 'A senha deve ter pelo menos 6 caracteres.';
+                    }
+                    
+                    showMessage(errorMessage, true);
+                    
+                    // Re-habilitar botão
+                    loginButton.disabled = false;
+                    loginButton.textContent = 'Entrar';
+                    return;
+                }
+
+                // SIMULAÇÃO DE CHAMADA DE API/AUTENTICAÇÃO (Para uso real, substitua este bloco pela sua integração Firebase/Backend)
+                try {
+                    // Simula um tempo de carregamento
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+
+                    // Credenciais de Teste: use "teste@competeplus.com" e "senha123" para sucesso
+                    if (email === "teste@competeplus.com" && password === "senha123") {
+                        showMessage('Login bem-sucedido! Redirecionando...', false);
+
+                        // Em um ambiente real, o redirecionamento viria aqui:
+                        window.location.href = '/home.html';
+                        
+                    } else {
+                        // Simula falha de login
+                        showMessage('Credenciais inválidas. Verifique seu e-mail e senha.', true);
+                    }
+
+                } catch (error) {
+                    console.error("Erro durante o processo de login:", error);
+                    showMessage('Ocorreu um erro ao tentar conectar. Tente novamente.', true);
+                } finally {
+                    // Re-habilitar botão após a tentativa
+                    loginButton.disabled = false;
+                    loginButton.textContent = 'Entrar';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

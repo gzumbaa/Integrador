@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minhas Inscrições - Compete+</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        /* --- CSS BASE (Padrão do Projeto) --- */
+        :root {
+            --primary-blue: #1a1054;
+            --light-blue: #255ff1;
+            --accent-green: #10B981;
+            --accent-orange: #F59E0B;
+            --text-white: #ffffff;
+            --text-dark: #1F2937;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background: linear-gradient(180deg, #0f1c4d 0%, #1c4bd6 100%);
+            color: var(--text-dark); 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+        }
+        
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; width: 100%; }
+        
+        /* --- HEADER (Padrão) --- */
+        header { padding: 20px 0; position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000; display: flex; justify-content: center; }
+        nav { display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.90); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.6); padding: 12px 30px; border-radius: 50px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15); width: 100%; max-width: 1200px; }
+        .logo { font-size: 1.5rem; font-weight: 800; color: var(--primary-blue); display: flex; align-items: center; }
+        .logo span { color: var(--accent-orange); font-weight: 900; }
+        .nav-links { display: flex; gap: 30px; align-items: center; }
+        .nav-links a { color: rgb(0, 0, 0); font-size: 0.95rem; font-weight: 500; padding: 8px 12px; border-radius: 30px; transition: 0.3s; }
+        .nav-links a:hover:not(.active) { color: var(--primary-blue); background-color: rgba(0, 0, 0, 0.05); }
+        .nav-links .active { color: var(--primary-blue); font-weight: 600; background-color: #e2e8f0; }
+        .btn-nav { background: linear-gradient(135deg, #0ea5e9 0%, #2563EB 100%); color: white !important; padding: 10px 28px; border-radius: 50px; font-weight: 600 !important; }
+        .hamburger { display: none; font-size: 1.5rem; color: var(--primary-blue); cursor: pointer; }
+
+        /* --- ESTILOS DA PÁGINA DE INSCRIÇÕES --- */
+        .tickets-section {
+            margin-top: 140px;
+            margin-bottom: 60px;
+            width: 100%;
+        }
+
+        .page-title {
+            font-family: 'Merriweather', serif;
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+
+        /* Cartão Preto Grande */
+        .dark-card {
+            background-color: #ffffff; /* Fundo preto conforme a imagem */
+            border-radius: 20px;
+            padding: 40px;
+            min-height: 500px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        /* Botões de Abas */
+        .tabs-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 60px;
+        }
+
+        .tab-btn {
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s;
+            outline: none;
+        }
+
+        /* Botão Ativo (Roxo Azulado) */
+        .tab-btn.active {
+            background-color: #240090; /* Tom roxo escuro da imagem */
+            color: white;
+            box-shadow: 0 0 10px rgba(56, 43, 226, 0.4);
+            border: 1px solid #4c3ae3;
+        }
+
+        /* Botão Inativo (Azul Claro) */
+        .tab-btn.inactive {
+            background-color: #29a0b1; /* Tom azul/ciano da imagem */
+            color: #052c33;
+            opacity: 0.9;
+        }
+        
+        .tab-btn.inactive:hover {
+            opacity: 1;
+            transform: translateY(-2px);
+        }
+
+        /* Estado Vazio */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            margin-top: 50px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .empty-icon {
+            font-size: 5rem;
+            color: #7c8db5; /* Cor lilás/azulada do ícone */
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        .empty-text {
+            font-family: 'Merriweather', serif;
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            color: #000000;
+        }
+
+        /* Botão Encontrar Eventos */
+        .find-events-btn {
+            background: linear-gradient(90deg, #240090 0%, #4c3ae3 100%);
+            color: white;
+            padding: 12px 40px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.3s;
+        }
+
+        .find-events-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(76, 58, 227, 0.5);
+        }
+
+        /* Utilitário para esconder abas */
+        .tab-content { display: none; }
+        .tab-content.active-content { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- FOOTER (Padrão) --- */
+        footer { margin-top: auto; background: white; color: black; padding: 60px 0 20px 0; text-align: center; }
+        .footer-logo { font-size: 1.8rem; font-weight: 800; margin-bottom: 30px; display: inline-block; color: var(--primary-blue); }
+        .footer-logo span { color: var(--accent-orange); }
+        .footer-links { display: flex; justify-content: center; gap: 30px; margin-bottom: 40px; }
+        .footer-links a { opacity: 0.7; color: black; }
+        .copyright { font-size: 0.8rem; opacity: 0.5; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 20px; }
+
+        /* Responsividade */
+        @media (max-width: 900px) {
+            .nav-links { display: none; }
+            .hamburger { display: block; }
+            .tabs-container { flex-direction: column; width: 100%; }
+            .tab-btn { width: 100%; }
+            .page-title { text-align: center; font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <nav>
+                <a href="index.html" class="logo">Compete<span>+</span></a>
+                <div class="nav-links">
+                    <a href="index.html">Início</a>
+                    <a href="eventos.html">Eventos</a>
+                    <a href="organizador.html">Sou Organizador</a>
+                    <a href="inscricoes.html" class="active">Minhas Inscrições</a>
+                    <a href="perfil.html">Minha Conta</a>
+                    <a href="criarevento.html" class="btn-nav">Criar Evento →</a>
+                </div>
+                <div class="hamburger"><i class="fas fa-bars"></i></div>
+            </nav>
+        </header>
+    </div>
+
+    <div class="container">
+        <section class="tickets-section">
+            <h1 class="page-title">Meus Ingressos</h1>
+
+            <div class="dark-card">
+                
+                <div class="tabs-container">
+                    <button class="tab-btn active" id="btn-proximos" onclick="switchTab('proximos')">Próximos eventos</button>
+                    <button class="tab-btn inactive" id="btn-passados" onclick="switchTab('passados')">Eventos Passados</button>
+                </div>
+
+                <div id="content-proximos" class="tab-content active-content">
+                    <div class="empty-state">
+                        <i class="fas fa-ticket-alt empty-icon"></i>
+                        <p class="empty-text">Você não possui próximos eventos</p>
+                        
+                        <a href="eventos.html" class="find-events-btn">
+                            Encontrar eventos <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="content-passados" class="tab-content">
+                    <div class="empty-state">
+                        <i class="fas fa-history empty-icon"></i>
+                        <p class="empty-text">Você não participou de eventos anteriores.</p>
+                        
+                         <a href="eventos.html" class="find-events-btn">
+                            Ver calendário completo <i class="fas fa-calendar-alt"></i>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-logo">Compete<span>+</span></div>
+            <div class="footer-links">
+                <a href="#">Serviços</a>
+                <a href="#">Conteúdo</a>
+                <a href="#">Contato</a>
+            </div>
+            <p class="copyright">2025 - Compete+ • Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Lógica de Abas
+        function switchTab(tabName) {
+            // 1. Remove classe 'active' de todos os conteúdos e botões
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active-content'));
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                b.classList.remove('active');
+                b.classList.add('inactive'); // Reseta para estilo inativo
+            });
+
+            // 2. Adiciona classe 'active' ao conteúdo e botão selecionado
+            document.getElementById('content-' + tabName).classList.add('active-content');
+            
+            const activeBtn = document.getElementById('btn-' + tabName);
+            activeBtn.classList.remove('inactive');
+            activeBtn.classList.add('active');
+        }
+
+        // Menu Mobile
+        const hamburger = document.querySelector('.hamburger');
+        const navLinks = document.querySelector('.nav-links');
+        hamburger.addEventListener('click', () => {
+            if (navLinks.style.display === 'flex') {
+                navLinks.style.display = 'none';
+            } else {
+                navLinks.style.display = 'flex';
+                navLinks.style.flexDirection = 'column';
+                navLinks.style.position = 'absolute';
+                navLinks.style.top = '80px';
+                navLinks.style.right = '20px';
+                navLinks.style.background = 'white';
+                navLinks.style.padding = '20px';
+                navLinks.style.borderRadius = '20px';
+                navLinks.style.boxShadow = '0 10px 30px rgba(0,0,0,0.2)';
+                navLinks.style.width = '200px';
+            }
+        });
+    </script>
+</body>
+</html>
