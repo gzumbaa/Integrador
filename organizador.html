@@ -11,13 +11,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
-    <!-- Tailwind CSS (Para facilitar estilização dos modais e tabelas dinâmicas) -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Configuração de Estilos Originais + Adaptações -->
     <style>
-
-      
         :root {
             --primary-blue: #1a1054;
             --light-blue: #255ff1;
@@ -27,22 +24,9 @@
             font-family: 'Poppins', sans-serif;
             background-color: #f4f7fe;
             margin: 0;
-            overflow: hidden; /* Evita scroll duplo com a sidebar */
+            overflow: hidden;
         }
-/* --- HEADER (Igual ao Perfil) --- */
-        header { padding: 20px 0; position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000; display: flex; justify-content: center; }
-        nav { display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.90); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.6); padding: 12px 30px; border-radius: 50px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15); width: 100%; max-width: 1200px; }
-        .logo { font-size: 1.5rem; font-weight: 800; color: var(--primary-blue); display: flex; align-items: center; }
-        .logo span { color: var(--accent-orange); font-weight: 900; }
-        .nav-links { display: flex; gap: 30px; align-items: center; }
-        .nav-links a { color: #4b5563; font-size: 0.95rem; font-weight: 500; padding: 8px 12px; border-radius: 30px; transition: 0.3s; }
-        .nav-links a:hover:not(.active) { color: var(--primary-blue); background-color: rgba(0, 0, 0, 0.05); }
-        .nav-links .active { color: var(--primary-blue); font-weight: 600; background-color: #e2e8f0; }
-        .btn-nav { background: linear-gradient(135deg, #0ea5e9 0%, #2563EB 100%); color: white !important; padding: 10px 28px; border-radius: 50px; font-weight: 600 !important; }
-        .hamburger { display: none; font-size: 1.5rem; color: var(--primary-blue); cursor: pointer; }
-        
-        
-        
+
         /* --- Sidebar Customizada --- */
         .sidebar {
             background: linear-gradient(180deg, #1a1054 0%, #0f0838 100%);
@@ -81,12 +65,24 @@
         }
         .animate-slide-up { animation: slideUp 0.4s ease-out forwards; }
 
-        /* --- Utilitários de Scroll --- */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+
+        /* Toast Animation */
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .toast-enter { animation: slideInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+        /* Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 3px; }
 
-        /* Esconder elementos inicialmente */
         .hidden-el { display: none !important; }
     </style>
 </head>
@@ -137,52 +133,51 @@
     <!-- MAIN CONTENT AREA -->
     <main class="flex-1 flex flex-col relative overflow-hidden bg-[#f4f7fe]">
         
-        <header>
-            <nav>
-                <a href="index.html" class="logo">Compete<span>+</span></a>
-                <div class="nav-links">
-                    <a href="index2.html">Início</a>
-                    <a href="eventosorganizador.html" class="active">Eventos</a>
-                    <a href="organizador.html">Sou Organizador</a>
-                    <a href="orgperfil.html">Minha Conta</a>
-                    <a href="criarevento.html" class="btn-nav">Criar Evento →</a>
+        <!-- Header -->
+        <header class="bg-white/80 backdrop-blur-md h-16 border-b border-gray-200 flex items-center justify-between px-8 sticky top-0 z-10">
+            <h2 class="text-xl font-bold text-[#1a1054] animate-fade-in" id="page-title">Dashboard Geral</h2>
+            <div class="flex items-center gap-4">
+                <div class="bg-blue-50 text-[#255ff1] px-3 py-1 rounded-full text-xs font-semibold border border-blue-100 flex items-center">
+                    <span class="w-2 h-2 rounded-full bg-green-500 inline-block mr-1"></span> Online
                 </div>
-                <div class="hamburger"><i class="fas fa-bars"></i></div>
-            </nav>
+            </div>
         </header>
 
         <!-- Content Injection Container -->
         <div id="main-content" class="flex-1 overflow-y-auto p-8 relative">
-            <!-- O conteúdo será injetado aqui via JavaScript -->
+            <!-- Loading Inicial -->
             <div class="flex items-center justify-center h-full">
                 <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#255ff1]"></div>
             </div>
         </div>
+
+        <!-- Toast Container (Notificações) -->
+        <div id="toast-container" class="absolute top-20 right-8 z-50 flex flex-col gap-2 pointer-events-none"></div>
     </main>
 
-    <!-- --- MODAIS (Escondidos por padrão) --- -->
+    <!-- --- MODAIS --- -->
 
     <!-- Modal Campeonato -->
-    <div id="modal-campeonato" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden-el items-center justify-center p-4">
+    <div id="modal-campeonato" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden-el items-center justify-center p-4 animate-fade-in">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-slide-up">
             <div class="bg-[#1a1054] px-6 py-4 flex justify-between items-center">
                 <h3 class="text-white font-bold text-lg" id="modal-camp-title">Novo Campeonato</h3>
-                <button onclick="app.closeModals()" class="text-white/70 hover:text-white"><i class="fa-solid fa-times"></i></button>
+                <button onclick="app.closeModals()" class="text-white/70 hover:text-white transition"><i class="fa-solid fa-times"></i></button>
             </div>
             <form onsubmit="app.saveChampionship(event)" class="p-6 space-y-4">
                 <input type="hidden" id="camp-id">
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nome do Evento</label>
-                    <input type="text" id="camp-name" required class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#255ff1] outline-none" placeholder="Ex: Copa Verão">
+                    <input type="text" id="camp-name" required class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#255ff1] outline-none transition" placeholder="Ex: Copa Verão">
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Data</label>
-                        <input type="date" id="camp-date" required class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 outline-none">
+                        <input type="date" id="camp-date" required class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 outline-none transition">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Categoria</label>
-                        <select id="camp-category" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 outline-none">
+                        <select id="camp-category" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 outline-none transition">
                             <option>Profissional</option>
                             <option>Amador</option>
                             <option>Sub-20</option>
@@ -191,41 +186,41 @@
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Status</label>
-                    <select id="camp-status" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 outline-none">
+                    <select id="camp-status" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 outline-none transition">
                         <option value="Aberto">Aberto</option>
                         <option value="Em Andamento">Em Andamento</option>
                         <option value="Finalizado">Finalizado</option>
                     </select>
                 </div>
-                <div class="pt-4 flex justify-end gap-3">
-                    <button type="button" onclick="app.closeModals()" class="px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-lg">Cancelar</button>
-                    <button type="submit" class="px-6 py-2 bg-[#255ff1] text-white font-bold rounded-lg hover:bg-blue-700">Salvar</button>
+                <div class="pt-4 flex justify-end gap-3 bg-gray-50 -mx-6 -mb-6 p-4 mt-2">
+                    <button type="button" onclick="app.closeModals()" class="px-4 py-2 text-gray-500 hover:bg-gray-200 rounded-lg transition font-medium">Cancelar</button>
+                    <button type="submit" class="px-6 py-2 bg-[#255ff1] text-white font-bold rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition">Salvar</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Modal Atleta -->
-    <div id="modal-atleta" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden-el items-center justify-center p-4">
+    <div id="modal-atleta" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden-el items-center justify-center p-4 animate-fade-in">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-slide-up">
             <div class="bg-[#10B981] px-6 py-4 flex justify-between items-center">
                 <h3 class="text-white font-bold text-lg" id="modal-atleta-title">Novo Atleta</h3>
-                <button onclick="app.closeModals()" class="text-white/70 hover:text-white"><i class="fa-solid fa-times"></i></button>
+                <button onclick="app.closeModals()" class="text-white/70 hover:text-white transition"><i class="fa-solid fa-times"></i></button>
             </div>
             <form onsubmit="app.saveAthlete(event)" class="p-6 space-y-4">
                 <input type="hidden" id="atleta-id">
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nome Completo</label>
-                    <input type="text" id="atleta-name" required class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 outline-none focus:border-green-500">
+                    <input type="text" id="atleta-name" required class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 outline-none focus:border-green-500 transition">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Equipe / Time</label>
-                    <input type="text" id="atleta-team" required class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 outline-none focus:border-green-500">
+                    <input type="text" id="atleta-team" required class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 outline-none focus:border-green-500 transition">
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Categoria</label>
-                        <select id="atleta-category" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 outline-none">
+                        <select id="atleta-category" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 outline-none transition">
                             <option>Leve</option>
                             <option>Médio</option>
                             <option>Pesado</option>
@@ -234,54 +229,56 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Status</label>
-                        <select id="atleta-status" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 outline-none">
+                        <select id="atleta-status" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 outline-none transition">
                             <option>Ativo</option>
                             <option>Pendente</option>
                             <option>Suspenso</option>
                         </select>
                     </div>
                 </div>
-                <div class="pt-4 flex justify-end gap-3">
-                    <button type="button" onclick="app.closeModals()" class="px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-lg">Cancelar</button>
-                    <button type="submit" class="px-6 py-2 bg-[#10B981] text-white font-bold rounded-lg hover:bg-green-600">Salvar Atleta</button>
+                <div class="pt-4 flex justify-end gap-3 bg-gray-50 -mx-6 -mb-6 p-4 mt-2">
+                    <button type="button" onclick="app.closeModals()" class="px-4 py-2 text-gray-500 hover:bg-gray-200 rounded-lg transition font-medium">Cancelar</button>
+                    <button type="submit" class="px-6 py-2 bg-[#10B981] text-white font-bold rounded-lg hover:bg-green-600 shadow-lg shadow-green-500/30 transition">Salvar Atleta</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Modal Resultado -->
-    <div id="modal-resultado" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden-el items-center justify-center p-4">
+    <div id="modal-resultado" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden-el items-center justify-center p-4 animate-fade-in">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-slide-up">
             <div class="bg-gradient-to-r from-[#1a1054] to-[#2a2070] px-6 py-4 flex justify-between items-center">
                 <h3 class="text-white font-bold text-lg">Registrar Resultado</h3>
-                <button onclick="app.closeModals()" class="text-white/70 hover:text-white"><i class="fa-solid fa-times"></i></button>
+                <button onclick="app.closeModals()" class="text-white/70 hover:text-white transition"><i class="fa-solid fa-times"></i></button>
             </div>
             <form onsubmit="app.saveResult(event)" class="p-6 space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Campeonato</label>
-                    <select id="res-camp" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 outline-none"></select>
+                    <select id="res-camp" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 outline-none transition"></select>
                 </div>
                 <div class="flex items-center justify-between gap-2 p-4 bg-gray-50 rounded-xl border border-gray-100">
                     <div class="flex-1">
-                        <input type="text" id="res-a-name" required placeholder="Atleta A" class="w-full text-center bg-white border border-gray-200 rounded px-2 py-1 text-sm font-bold mb-2">
-                        <input type="number" id="res-a-score" required placeholder="0" class="w-full text-center text-2xl font-bold bg-transparent border-none focus:ring-0">
+                        <label class="block text-xs text-center text-gray-400 mb-1">ATLETA A</label>
+                        <input type="text" id="res-a-name" required placeholder="Nome" class="w-full text-center bg-white border border-gray-200 rounded px-2 py-1 text-sm font-bold mb-2 outline-none focus:border-blue-500">
+                        <input type="number" id="res-a-score" required placeholder="0" class="w-full text-center text-3xl font-bold bg-transparent border-none focus:ring-0 text-[#1a1054]">
                     </div>
-                    <span class="text-gray-400 font-bold text-xl">X</span>
+                    <span class="text-gray-300 font-bold text-2xl">X</span>
                     <div class="flex-1">
-                        <input type="text" id="res-b-name" required placeholder="Atleta B" class="w-full text-center bg-white border border-gray-200 rounded px-2 py-1 text-sm font-bold mb-2">
-                        <input type="number" id="res-b-score" required placeholder="0" class="w-full text-center text-2xl font-bold bg-transparent border-none focus:ring-0">
+                        <label class="block text-xs text-center text-gray-400 mb-1">ATLETA B</label>
+                        <input type="text" id="res-b-name" required placeholder="Nome" class="w-full text-center bg-white border border-gray-200 rounded px-2 py-1 text-sm font-bold mb-2 outline-none focus:border-blue-500">
+                        <input type="number" id="res-b-score" required placeholder="0" class="w-full text-center text-3xl font-bold bg-transparent border-none focus:ring-0 text-[#1a1054]">
                     </div>
                 </div>
-                <div class="pt-4 flex justify-end gap-3">
-                    <button type="button" onclick="app.closeModals()" class="px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-lg">Cancelar</button>
-                    <button type="submit" class="px-6 py-2 bg-[#1a1054] text-white font-bold rounded-lg hover:bg-blue-900">Confirmar Placar</button>
+                <div class="pt-4 flex justify-end gap-3 bg-gray-50 -mx-6 -mb-6 p-4 mt-2">
+                    <button type="button" onclick="app.closeModals()" class="px-4 py-2 text-gray-500 hover:bg-gray-200 rounded-lg transition font-medium">Cancelar</button>
+                    <button type="submit" class="px-6 py-2 bg-[#1a1054] text-white font-bold rounded-lg hover:bg-blue-900 shadow-lg shadow-blue-500/30 transition">Confirmar Placar</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Modal Delete -->
-    <div id="modal-delete" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden-el items-center justify-center p-4">
+    <div id="modal-delete" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden-el items-center justify-center p-4 animate-fade-in">
         <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 animate-slide-up border-t-4 border-red-500">
             <div class="flex flex-col items-center text-center">
                 <div class="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mb-4 text-red-500 text-2xl">
@@ -290,8 +287,8 @@
                 <h3 class="text-xl font-bold text-gray-800 mb-2">Excluir Item?</h3>
                 <p class="text-gray-500 text-sm mb-6" id="delete-msg">Você tem certeza?</p>
                 <div class="flex gap-3 w-full">
-                    <button onclick="app.cancelDelete()" class="flex-1 py-2.5 bg-gray-100 text-gray-600 font-semibold rounded-lg hover:bg-gray-200">Cancelar</button>
-                    <button onclick="app.confirmDelete()" class="flex-1 py-2.5 bg-red-500 text-white font-bold rounded-lg hover:bg-red-600 shadow-lg shadow-red-500/30">Sim, Excluir</button>
+                    <button onclick="app.cancelDelete()" class="flex-1 py-2.5 bg-gray-100 text-gray-600 font-semibold rounded-lg hover:bg-gray-200 transition">Cancelar</button>
+                    <button onclick="app.confirmDelete()" class="flex-1 py-2.5 bg-red-500 text-white font-bold rounded-lg hover:bg-red-600 shadow-lg shadow-red-500/30 transition">Sim, Excluir</button>
                 </div>
             </div>
         </div>
@@ -313,17 +310,41 @@
         const auth = getAuth(firebaseApp);
         const db = getFirestore(firebaseApp);
 
-        // Estado Global da Aplicação
+        // Estado Global
         const state = {
             user: null,
             currentSection: 'resumo',
-            data: {
-                championships: [],
-                athletes: [],
-                results: []
-            },
-            deleteTarget: null // { id, collection }
+            data: { championships: [], athletes: [], results: [] },
+            deleteTarget: null
         };
+
+        // --- SISTEMA DE TOAST (NOTIFICAÇÕES) ---
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const colors = type === 'success' 
+                ? 'bg-white border-l-4 border-green-500 text-gray-800' 
+                : 'bg-white border-l-4 border-red-500 text-gray-800';
+            
+            const icon = type === 'success' ? '<i class="fa-solid fa-check-circle text-green-500"></i>' : '<i class="fa-solid fa-exclamation-circle text-red-500"></i>';
+
+            toast.className = `toast-enter p-4 rounded-lg shadow-lg flex items-center gap-3 w-72 pointer-events-auto ${colors}`;
+            toast.innerHTML = `
+                ${icon}
+                <div class="text-sm font-medium">${message}</div>
+            `;
+
+            container.appendChild(toast);
+
+            // Remove após 3s
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                toast.style.transition = 'all 0.4s ease';
+                setTimeout(() => toast.remove(), 400);
+            }, 3000);
+        }
 
         // --- AUTH ---
         async function initAuth() {
@@ -335,6 +356,7 @@
                 }
             } catch (error) {
                 console.error("Erro auth:", error);
+                showToast("Erro na autenticação", "error");
             }
         }
 
@@ -343,18 +365,16 @@
                 state.user = user;
                 document.getElementById('user-id-display').textContent = `ID: ${user.uid.slice(0, 8)}...`;
                 initDataListeners(user.uid);
-            } else {
-                document.getElementById('main-content').innerHTML = '<div class="p-8 text-center text-red-500">Erro de autenticação. Recarregue a página.</div>';
             }
         });
 
-        // --- LISTENERS (TEMPO REAL) ---
+        // --- LISTENERS (REALTIME) ---
         function initDataListeners(uid) {
             // Campeonatos
             const qCamps = query(collection(db, `artifacts/${appId}/users/${uid}/championships`), orderBy('date', 'desc'));
             onSnapshot(qCamps, (snap) => {
                 state.data.championships = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                renderIfActive('resumo', 'campeonatos', 'resultados'); // Resultados depende dos nomes dos campeonatos
+                renderIfActive('resumo', 'campeonatos', 'resultados');
             });
 
             // Atletas
@@ -378,18 +398,15 @@
             }
         }
 
-        // --- RENDERIZAÇÃO ---
+        // --- APLICAÇÃO ---
         
         window.app = {
             // Navegação
             setSection: (sec) => {
                 state.currentSection = sec;
-                
-                // Atualiza Sidebar UI
                 document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active-link'));
                 document.getElementById(`nav-${sec}`).classList.add('active-link');
                 
-                // Atualiza Título
                 const titles = {
                     'resumo': 'Dashboard Geral',
                     'campeonatos': 'Gestão de Campeonatos',
@@ -397,7 +414,6 @@
                     'resultados': 'Central de Resultados'
                 };
                 document.getElementById('page-title').textContent = titles[sec];
-
                 renderSection(sec);
             },
 
@@ -409,14 +425,12 @@
                 });
             },
 
-            // --- FUNÇÕES DE AÇÃO (CRUD) ---
-
-            // CAMPEONATOS
+            // --- CRUD CAMPEONATOS ---
             openChampionshipModal: (id = null) => {
                 const modal = document.getElementById('modal-campeonato');
                 const title = document.getElementById('modal-camp-title');
                 
-                // Reset form
+                // Reset
                 document.getElementById('camp-id').value = '';
                 document.getElementById('camp-name').value = '';
                 document.getElementById('camp-date').value = new Date().toISOString().split('T')[0];
@@ -436,7 +450,6 @@
                 } else {
                     title.textContent = 'Novo Campeonato';
                 }
-
                 modal.classList.remove('hidden-el');
                 modal.classList.add('flex');
             },
@@ -454,14 +467,16 @@
                 const col = collection(db, `artifacts/${appId}/users/${state.user.uid}/championships`);
                 
                 app.closeModals();
-                if (id) {
-                    await setDoc(doc(col, id), data);
-                } else {
-                    await addDoc(col, data);
+                try {
+                    if (id) await setDoc(doc(col, id), data);
+                    else await addDoc(col, data);
+                    showToast(id ? 'Campeonato atualizado!' : 'Campeonato criado!');
+                } catch(err) {
+                    showToast('Erro ao salvar', 'error');
                 }
             },
 
-            // ATLETAS
+            // --- CRUD ATLETAS ---
             openAthleteModal: (id = null) => {
                 const modal = document.getElementById('modal-atleta');
                 const title = document.getElementById('modal-atleta-title');
@@ -485,7 +500,6 @@
                 } else {
                     title.textContent = 'Novo Atleta';
                 }
-
                 modal.classList.remove('hidden-el');
                 modal.classList.add('flex');
             },
@@ -503,20 +517,24 @@
                 const col = collection(db, `artifacts/${appId}/users/${state.user.uid}/athletes`);
                 
                 app.closeModals();
-                if (id) {
-                    await setDoc(doc(col, id), data);
-                } else {
-                    await addDoc(col, data);
+                try {
+                    if (id) await setDoc(doc(col, id), data);
+                    else await addDoc(col, data);
+                    showToast(id ? 'Atleta atualizado!' : 'Atleta cadastrado!');
+                } catch(err) {
+                    showToast('Erro ao salvar', 'error');
                 }
             },
 
-            // RESULTADOS
+            // --- CRUD RESULTADOS ---
             openResultModal: () => {
                 const modal = document.getElementById('modal-resultado');
                 const select = document.getElementById('res-camp');
                 
-                // Popular select
                 select.innerHTML = state.data.championships.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+                if(state.data.championships.length === 0) {
+                    select.innerHTML = '<option>Nenhum campeonato disponível</option>';
+                }
                 
                 document.getElementById('res-a-name').value = '';
                 document.getElementById('res-a-score').value = '';
@@ -549,10 +567,15 @@
 
                 const col = collection(db, `artifacts/${appId}/users/${state.user.uid}/results`);
                 app.closeModals();
-                await addDoc(col, data);
+                try {
+                    await addDoc(col, data);
+                    showToast('Resultado registrado!');
+                } catch(err) {
+                    showToast('Erro ao salvar', 'error');
+                }
             },
 
-            // EXCLUSÃO
+            // --- EXCLUSÃO ---
             requestDelete: (id, type, name) => {
                 state.deleteTarget = { id, type };
                 const modal = document.getElementById('modal-delete');
@@ -568,9 +591,10 @@
                 
                 try {
                     await deleteDoc(doc(db, `artifacts/${appId}/users/${state.user.uid}/${colName}/${id}`));
+                    showToast('Item excluído com sucesso!');
                     app.cancelDelete();
                 } catch (e) {
-                    console.error(e);
+                    showToast('Erro ao excluir', 'error');
                 }
             },
 
@@ -582,8 +606,7 @@
             }
         };
 
-        // --- RENDERIZADORES DE HTML ---
-
+        // --- RENDERIZADORES ---
         function renderSection(section) {
             const container = document.getElementById('main-content');
             
@@ -597,7 +620,6 @@
                                 <h3 class="text-3xl font-bold text-[#1a1054]">${activeCamps}</h3>
                             </div>
                             <div class="w-10 h-10 rounded-lg bg-blue-50 text-[#255ff1] flex items-center justify-center z-10"><i class="fa-solid fa-trophy"></i></div>
-                            <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-[#255ff1] to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
                         </div>
                         <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-start group hover:shadow-lg transition-all relative overflow-hidden">
                             <div class="z-10">
@@ -605,20 +627,26 @@
                                 <h3 class="text-3xl font-bold text-[#1a1054]">${state.data.athletes.length}</h3>
                             </div>
                             <div class="w-10 h-10 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center z-10"><i class="fa-solid fa-users"></i></div>
-                            <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-purple-600 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
                         </div>
                          <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-start group hover:shadow-lg transition-all relative overflow-hidden">
                             <div class="z-10">
-                                <p class="text-gray-500 text-sm font-medium mb-1">Partidas</p>
+                                <p class="text-gray-500 text-sm font-medium mb-1">Partidas Realizadas</p>
                                 <h3 class="text-3xl font-bold text-[#1a1054]">${state.data.results.length}</h3>
                             </div>
                             <div class="w-10 h-10 rounded-lg bg-green-50 text-green-600 flex items-center justify-center z-10"><i class="fa-solid fa-check-circle"></i></div>
-                            <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-green-600 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
                         </div>
                     </div>
+                    
                     <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 animate-slide-up">
-                        <h3 class="text-lg font-bold text-[#1a1054] mb-4">Bem-vindo, Organizador!</h3>
-                        <p class="text-gray-500">Selecione uma opção no menu lateral para começar a gerenciar seus eventos.</p>
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-[#255ff1] text-xl">
+                                <i class="fa-solid fa-rocket"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-[#1a1054]">Bem-vindo ao Painel!</h3>
+                                <p class="text-gray-500 text-sm">Seu sistema está pronto. Use o menu lateral para gerenciar.</p>
+                            </div>
+                        </div>
                     </div>
                 `;
             }
@@ -629,12 +657,12 @@
                     return `
                         <tr class="hover:bg-blue-50/50 transition-colors group border-b border-gray-50">
                             <td class="px-6 py-4 font-semibold text-[#1a1054]">${c.name}</td>
-                            <td class="px-6 py-4 text-gray-600">${c.date}</td>
-                            <td class="px-6 py-4 text-gray-600"><span class="px-2 py-1 bg-gray-100 rounded text-xs">${c.category}</span></td>
-                            <td class="px-6 py-4"><span class="${statusClass} px-3 py-1 rounded-full text-xs font-semibold">${c.status}</span></td>
+                            <td class="px-6 py-4 text-gray-600 text-sm"><i class="fa-regular fa-calendar mr-2"></i>${c.date}</td>
+                            <td class="px-6 py-4 text-gray-600"><span class="px-2 py-1 bg-gray-100 rounded text-xs font-medium border border-gray-200">${c.category}</span></td>
+                            <td class="px-6 py-4"><span class="${statusClass} px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">${c.status}</span></td>
                             <td class="px-6 py-4 text-right space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button onclick="app.openChampionshipModal('${c.id}')" class="text-blue-500 hover:bg-blue-100 p-2 rounded transition"><i class="fa-solid fa-pen"></i></button>
-                                <button onclick="app.requestDelete('${c.id}', 'camp', '${c.name}')" class="text-red-500 hover:bg-red-100 p-2 rounded transition"><i class="fa-solid fa-trash"></i></button>
+                                <button onclick="app.openChampionshipModal('${c.id}')" class="text-blue-500 hover:bg-blue-100 w-8 h-8 rounded-full transition"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="app.requestDelete('${c.id}', 'camp', '${c.name}')" class="text-red-500 hover:bg-red-100 w-8 h-8 rounded-full transition"><i class="fa-solid fa-trash"></i></button>
                             </td>
                         </tr>
                     `;
@@ -642,13 +670,20 @@
 
                 container.innerHTML = `
                     <div class="space-y-6 animate-slide-up">
-                        <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm">
-                            <div class="relative"><i class="fa-solid fa-search absolute left-3 top-3 text-gray-400 text-sm"></i><input type="text" placeholder="Buscar..." class="pl-10 pr-4 py-2 bg-gray-50 border-none rounded-lg text-sm focus:ring-2 focus:ring-[#255ff1] outline-none"></div>
-                            <button onclick="app.openChampionshipModal()" class="bg-[#255ff1] hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm font-medium shadow-lg shadow-blue-500/30 flex items-center gap-2"><i class="fa-solid fa-plus"></i> Novo Campeonato</button>
+                        <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                            <div class="relative group">
+                                <i class="fa-solid fa-search absolute left-3 top-3 text-gray-400 text-sm group-hover:text-blue-500 transition"></i>
+                                <input type="text" placeholder="Buscar campeonato..." class="pl-10 pr-4 py-2 bg-gray-50 border border-transparent hover:bg-white hover:border-gray-200 focus:bg-white focus:border-blue-500 rounded-lg text-sm outline-none w-64 transition">
+                            </div>
+                            <button onclick="app.openChampionshipModal()" class="bg-[#255ff1] hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm font-bold shadow-lg shadow-blue-500/30 flex items-center gap-2 transition transform hover:-translate-y-0.5"><i class="fa-solid fa-plus"></i> Novo</button>
                         </div>
                         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                            <table class="w-full text-sm text-left"><thead class="bg-gray-50 text-gray-500 font-medium border-b border-gray-100"><tr><th class="px-6 py-4">Nome</th><th class="px-6 py-4">Data</th><th class="px-6 py-4">Categoria</th><th class="px-6 py-4">Status</th><th class="px-6 py-4 text-right">Ações</th></tr></thead>
-                            <tbody>${rows || '<tr><td colspan="5" class="px-6 py-8 text-center text-gray-400">Nenhum campeonato encontrado.</td></tr>'}</tbody></table>
+                            <table class="w-full text-sm text-left">
+                                <thead class="bg-gray-50 text-gray-500 font-semibold border-b border-gray-100 text-xs uppercase tracking-wider">
+                                    <tr><th class="px-6 py-4">Nome</th><th class="px-6 py-4">Data</th><th class="px-6 py-4">Categoria</th><th class="px-6 py-4">Status</th><th class="px-6 py-4 text-right">Ações</th></tr>
+                                </thead>
+                                <tbody>${rows || '<tr><td colspan="5" class="px-6 py-12 text-center text-gray-400 flex flex-col items-center"><i class="fa-regular fa-folder-open text-4xl mb-2 opacity-30"></i>Nenhum campeonato encontrado.</td></tr>'}</tbody>
+                            </table>
                         </div>
                     </div>
                 `;
@@ -656,18 +691,18 @@
 
             else if (section === 'atletas') {
                 const cards = state.data.athletes.map(a => {
-                    const statusClass = a.status === 'Ativo' ? 'text-green-600 bg-green-50 border-green-200' : 'text-red-500 bg-red-50 border-red-200';
+                    const statusClass = a.status === 'Ativo' ? 'text-green-600 bg-green-50 border-green-200' : a.status === 'Pendente' ? 'text-orange-500 bg-orange-50 border-orange-200' : 'text-red-500 bg-red-50 border-red-200';
                     return `
                        <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition relative group">
                           <div class="flex items-start justify-between mb-3">
-                             <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-xl text-gray-400 font-bold uppercase">${a.name.charAt(0)}</div>
+                             <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-lg text-gray-500 font-bold uppercase">${a.name.charAt(0)}</div>
                              <span class="${statusClass} text-[10px] px-2 py-0.5 rounded-full border uppercase tracking-wider font-bold">${a.status}</span>
                           </div>
-                          <h4 class="font-bold text-[#1a1054] text-lg">${a.name}</h4>
-                          <p class="text-gray-500 text-sm mb-4">${a.team} • ${a.category}</p>
+                          <h4 class="font-bold text-[#1a1054] text-lg truncate" title="${a.name}">${a.name}</h4>
+                          <p class="text-gray-500 text-xs mb-4 uppercase tracking-wide font-medium">${a.team} • ${a.category}</p>
                           <div class="pt-3 border-t border-gray-50 flex justify-end gap-2">
-                             <button onclick="app.openAthleteModal('${a.id}')" class="text-xs text-blue-600 font-medium hover:underline">Editar</button>
-                             <button onclick="app.requestDelete('${a.id}', 'athlete', '${a.name}')" class="text-xs text-red-500 font-medium hover:underline">Excluir</button>
+                             <button onclick="app.openAthleteModal('${a.id}')" class="text-xs text-blue-600 font-bold hover:underline">EDITAR</button>
+                             <button onclick="app.requestDelete('${a.id}', 'athlete', '${a.name}')" class="text-xs text-red-500 font-bold hover:underline">EXCLUIR</button>
                           </div>
                        </div>
                     `;
@@ -675,12 +710,12 @@
 
                 container.innerHTML = `
                     <div class="space-y-6 animate-slide-up">
-                        <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm">
-                            <h3 class="font-bold text-[#1a1054]">Gerenciar Atletas</h3>
-                            <button onclick="app.openAthleteModal()" class="bg-[#10B981] hover:bg-green-600 text-white px-5 py-2 rounded-lg text-sm font-medium shadow-lg shadow-green-500/30 flex items-center gap-2"><i class="fa-solid fa-user-plus"></i> Novo Atleta</button>
+                        <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                            <h3 class="font-bold text-[#1a1054] flex items-center gap-2"><i class="fa-solid fa-users text-blue-500"></i> Gerenciar Atletas</h3>
+                            <button onclick="app.openAthleteModal()" class="bg-[#10B981] hover:bg-green-600 text-white px-5 py-2 rounded-lg text-sm font-bold shadow-lg shadow-green-500/30 flex items-center gap-2 transition transform hover:-translate-y-0.5"><i class="fa-solid fa-user-plus"></i> Novo Atleta</button>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            ${cards || '<div class="col-span-3 text-center py-10 text-gray-400">Nenhum atleta cadastrado.</div>'}
+                            ${cards || '<div class="col-span-3 py-12 text-center text-gray-400 flex flex-col items-center"><i class="fa-solid fa-users-slash text-4xl mb-2 opacity-30"></i>Nenhum atleta cadastrado.</div>'}
                         </div>
                     </div>
                 `;
@@ -688,30 +723,33 @@
 
             else if (section === 'resultados') {
                 const rows = state.data.results.map(r => `
-                    <tr class="hover:bg-gray-50 border-b border-gray-50">
+                    <tr class="hover:bg-gray-50 border-b border-gray-50 transition">
                         <td class="px-6 py-4 font-medium text-[#1a1054]">${r.championshipName}</td>
-                        <td class="px-6 py-4 text-center text-gray-600">${r.athleteA} <span class="text-xs text-gray-400 mx-1">VS</span> ${r.athleteB}</td>
-                        <td class="px-6 py-4 text-center font-mono font-bold text-lg">
-                            <span class="${r.scoreA > r.scoreB ? 'text-green-600' : ''}">${r.scoreA}</span> - <span class="${r.scoreB > r.scoreA ? 'text-green-600' : ''}">${r.scoreB}</span>
+                        <td class="px-6 py-4 text-center text-gray-600 font-medium">${r.athleteA} <span class="text-xs text-gray-300 mx-2 font-light">VS</span> ${r.athleteB}</td>
+                        <td class="px-6 py-4 text-center font-mono font-bold text-lg tracking-wider">
+                            <span class="${r.scoreA > r.scoreB ? 'text-green-600' : 'text-gray-400'}">${r.scoreA}</span>
+                            <span class="text-gray-300 mx-1">:</span>
+                            <span class="${r.scoreB > r.scoreA ? 'text-green-600' : 'text-gray-400'}">${r.scoreB}</span>
                         </td>
-                        <td class="px-6 py-4"><span class="text-green-600 font-bold text-xs bg-green-50 px-2 py-1 rounded border border-green-100"><i class="fa-solid fa-crown mr-1"></i> ${r.winner}</span></td>
-                        <td class="px-6 py-4 text-right"><button onclick="app.requestDelete('${r.id}', 'res', 'Jogo ${r.athleteA} vs ${r.athleteB}')" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td>
+                        <td class="px-6 py-4"><span class="text-green-700 font-bold text-xs bg-green-50 px-2 py-1 rounded border border-green-100 flex items-center w-fit gap-1"><i class="fa-solid fa-crown text-yellow-500"></i> ${r.winner}</span></td>
+                        <td class="px-6 py-4 text-right"><button onclick="app.requestDelete('${r.id}', 'res', 'Jogo ${r.athleteA} vs ${r.athleteB}')" class="text-gray-400 hover:text-red-500 transition"><i class="fa-solid fa-trash"></i></button></td>
                     </tr>
                 `).join('');
 
                 container.innerHTML = `
                    <div class="space-y-6 animate-slide-up">
-                      <div class="bg-gradient-to-r from-[#1a1054] to-[#2a2070] text-white p-6 rounded-2xl shadow-lg relative overflow-hidden">
+                      <div class="bg-gradient-to-r from-[#1a1054] to-[#2a2070] text-white p-6 rounded-2xl shadow-lg relative overflow-hidden flex justify-between items-center">
                          <div class="relative z-10">
-                            <h3 class="text-xl font-bold mb-2">Central de Resultados</h3>
-                            <button onclick="app.openResultModal()" class="bg-white text-[#1a1054] px-4 py-2 rounded-lg text-sm font-bold shadow hover:bg-gray-100 transition mt-2"><i class="fa-solid fa-plus mr-1"></i> Lançar Placar</button>
+                            <h3 class="text-xl font-bold mb-1">Central de Resultados</h3>
+                            <p class="text-blue-200 text-xs mb-0 opacity-80">Registre placares oficiais e acompanhe vencedores.</p>
                          </div>
-                         <i class="fa-solid fa-trophy text-9xl absolute -right-4 -bottom-4 text-white opacity-5"></i>
+                         <button onclick="app.openResultModal()" class="relative z-10 bg-white text-[#1a1054] px-4 py-2 rounded-lg text-sm font-bold shadow hover:bg-gray-100 transition transform hover:-translate-y-0.5"><i class="fa-solid fa-plus mr-1"></i> Lançar</button>
+                         <i class="fa-solid fa-trophy text-8xl absolute -right-6 -bottom-8 text-white opacity-5 pointer-events-none"></i>
                       </div>
-                      <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+                      <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                          <table class="w-full text-sm">
-                            <thead class="bg-gray-50 border-b border-gray-100"><tr><th class="px-6 py-3 text-left">Camp</th><th class="px-6 py-3 text-center">Partida</th><th class="px-6 py-3 text-center">Placar</th><th class="px-6 py-3 text-left">Vencedor</th><th class="px-6 py-3"></th></tr></thead>
-                            <tbody>${rows || '<tr><td colspan="5" class="px-6 py-8 text-center text-gray-400">Nenhum resultado lançado.</td></tr>'}</tbody>
+                            <thead class="bg-gray-50 border-b border-gray-100 text-xs uppercase text-gray-500 font-semibold"><tr><th class="px-6 py-4 text-left">Evento</th><th class="px-6 py-4 text-center">Confronto</th><th class="px-6 py-4 text-center">Placar</th><th class="px-6 py-4 text-left">Vencedor</th><th class="px-6 py-4"></th></tr></thead>
+                            <tbody>${rows || '<tr><td colspan="5" class="px-6 py-12 text-center text-gray-400">Nenhum resultado lançado.</td></tr>'}</tbody>
                          </table>
                       </div>
                    </div>
@@ -719,7 +757,6 @@
             }
         }
 
-        // Inicia
         initAuth();
     </script>
 </body>
