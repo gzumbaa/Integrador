@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compete+ | Dashboard do Organizador</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    
+    <style>
+        /* --- CSS Reset e Variáveis --- */
+        :root {
+            --primary-blue: #1a1054;
+            --light-blue: #255ff1;
+            --accent-green: #10B981;
+            --accent-orange: #F59E0B;
+            --text-white: #ffffff;
+            --text-dark: #1F2937;
+            --card-bg: #ffffff;
+            --border-radius: 16px;
+            --dashboard-bg: #f3f4f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(45deg, var(--primary-blue), var(--light-blue));
+            color: var(--text-white);
+            min-height: 100vh;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* --- Navbar (Mantida) --- */
+        header { padding: 20px 0; position: sticky; top: 0; z-index: 1000; }
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(255, 255, 255, 0.90); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6); padding: 12px 30px; border-radius: 50px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+        }
+        .logo { font-size: 1.5rem; font-weight: 800; color: var(--primary-blue); display: flex; align-items: center; }
+        .logo span { color: var(--accent-orange); font-weight: 900; }
+        .nav-links { display: flex; gap: 30px; align-items: center; }
+        .nav-links a {
+            color: #4b5563; font-size: 0.95rem; font-weight: 500; padding: 8px 12px; border-radius: 30px; transition: all 0.3s ease;
+        }
+        .nav-links a:hover:not(.active) { color: var(--primary-blue); background-color: rgba(0, 0, 0, 0.05); }
+        .nav-links .active {
+            color: var(--primary-blue); font-weight: 600; background-color: #e2e8f0; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .btn-nav {
+            background: linear-gradient(135deg, #0ea5e9 0%, #2563EB 100%); color: white !important;
+            padding: 10px 28px; border-radius: 50px; font-weight: 600 !important;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3); transition: 0.3s;
+        }
+        .btn-nav:hover { box-shadow: 0 6px 15px rgba(37, 99, 235, 0.5); transform: translateY(-2px); }
+        .hamburger { display: none; font-size: 1.5rem; color: var(--primary-blue); cursor: pointer; padding-right: 10px; }
+        
+        /* --- Estrutura Principal do Dashboard --- */
+        .dashboard-container { padding: 30px 0 80px 0; }
+        .dashboard-card {
+            background-color: var(--dashboard-bg); border-radius: var(--border-radius);
+            padding: 20px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            display: flex; color: var(--text-dark); min-height: 750px; position: relative;
+        }
+
+        /* --- ESTILOS DO FOOTER --- */
+    footer {
+        background: #ffffff;
+        color: #000000;
+        padding: 60px 0 20px 0;
+        text-align: center;
+        margin-top: auto; /* Empurra o footer para o final se a página tiver pouco conteúdo */
+    }
+
+    /* Utilitário de container (caso não tenha na página) */
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .footer-logo {
+        font-size: 1.8rem;
+        font-weight: 800;
+        margin-bottom: 30px;
+        display: inline-block;
+        color: #1a1054; /* Azul escuro principal */
+    }
+    .footer-logo span { 
+        color: #F59E0B; /* Laranja do acento */
+    }
+
+    .footer-links {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        margin-bottom: 40px;
+    }
+
+    .footer-links a { 
+        opacity: 0.7; 
+        transition: 0.3s; 
+        color: #000; 
+        text-decoration: none;
+    }
+    .footer-links a:hover { 
+        opacity: 1; 
+        color: #1a1054; 
+    }
+
+    .copyright {
+        font-size: 0.8rem;
+        opacity: 0.5;
+        border-top: 1px solid rgba(0,0,0,0.1);
+        padding-top: 20px;
+        color: #000;
+    }
+
+    /* Ajuste para mobile */
+    @media (max-width: 600px) {
+        .footer-links {
+            flex-direction: column;
+            gap: 15px;
+        }
+    }
+  
+
+        /* --- Menu Lateral (Sidebar) --- */
+        .sidebar {
+            width: 250px; background-color: var(--card-bg); padding: 20px 0;
+            border-radius: var(--border-radius); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-right: 20px; display: flex; flex-direction: column; gap: 5px;
+        }
+
+        .sidebar a {
+            display: flex; align-items: center; padding: 10px 20px;
+            color: #4b5563; font-weight: 500; cursor: pointer;
+            transition: background-color 0.2s, color 0.2s, transform 0.2s;
+            border-radius: 0 30px 30px 0; margin-right: 10px;
+        }
+        .sidebar a:hover:not(.sidebar-active) {
+            background-color: #f0f0f0; color: var(--primary-blue); transform: translateX(5px);
+        }
+        .sidebar a .material-symbols-rounded { margin-right: 15px; font-size: 24px; color: #9ca3af; transition: color 0.2s; }
+        
+        .sidebar-active {
+            color: var(--primary-blue) !important; background-color: #e2e8f0;
+            font-weight: 600 !important; position: relative;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        .sidebar-active .material-symbols-rounded { color: var(--primary-blue) !important; fill: 1; }
+        .sidebar-active::after {
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+            width: 4px; background-color: var(--light-blue); border-radius: 0 50px 50px 0;
+        }
+
+        /* --- Conteúdo Principal (Main) --- */
+        .main-content {
+            flex-grow: 1; padding: 25px; background-color: var(--card-bg);
+            border-radius: var(--border-radius); overflow: hidden;
+            transition: opacity 0.3s ease-in-out; /* Efeito de transição de conteúdo */
+        }
+        
+        /* Layout Comum */
+        .content-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid #e5e7eb;
+        }
+        .content-header h2 { font-size: 1.8rem; color: var(--primary-blue); }
+        .content-actions .btn { border: none; }
+        .btn-default { background-color: #e5e7eb; color: #4b5563; }
+        .btn-primary { background-color: var(--light-blue); color: var(--text-white); }
+        
+        /* --- Estilos Específicos de Seção --- */
+        
+        /* 1. Página do Evento */
+        .page-editor {
+            border: 2px dashed #ccc; padding: 40px; border-radius: 12px;
+            text-align: center; color: #9ca3af;
+        }
+        .page-editor h3 { color: var(--text-dark); margin-bottom: 10px; }
+
+        /* 2. Inscrições / Participantes */
+        .table-view {
+            width: 100%; border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        .table-view th, .table-view td {
+            text-align: left; padding: 12px 15px; border-bottom: 1px solid #e5e7eb;
+        }
+        .table-view th {
+            background-color: #f9fafb; color: #6b7280; font-weight: 600; text-transform: uppercase;
+        }
+        .table-view tbody tr:hover { background-color: #f3f4f6; }
+        .badge { padding: 4px 8px; border-radius: 50px; font-weight: 500; font-size: 0.75rem; }
+        .badge-green { background-color: #d1fae5; color: var(--accent-green); }
+        .badge-orange { background-color: #fef3c7; color: var(--accent-orange); }
+
+        /* 3. Financeiro */
+        .financial-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+        }
+        .finance-card {
+            background-color: #f9fafb; padding: 20px; border-radius: 8px;
+            border-left: 5px solid;
+        }
+        .finance-card h3 { font-size: 1rem; color: #6b7280; margin-bottom: 5px; }
+        .finance-card p { font-size: 1.8rem; font-weight: 700; }
+        .card-green { border-color: var(--accent-green); }
+        .card-blue { border-color: var(--light-blue); }
+        .card-orange { border-color: var(--accent-orange); }
+
+        /* 4. Check-in e Outros */
+        .setting-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 0; border-bottom: 1px solid #e5e7eb;
+        }
+        .setting-item h3 { font-size: 1.1rem; color: var(--text-dark); }
+        .setting-item p { color: #6b7280; font-size: 0.9rem; }
+        .setting-item button { 
+            padding: 8px 20px; border-radius: 50px; font-size: 0.9rem;
+            background-color: var(--light-blue); color: white; border: none;
+            cursor: pointer; transition: background-color 0.2s;
+        }
+
+        /* Gráfico de Linha e Rosca (Mantidos do Resumo) */
+        /* [Incluir todos os estilos de gráfico do código anterior aqui para o Resumo funcionar] */
+        .event-details, .summary-title, .inscription-summary, .view-data-link, .charts-container, .summary-box, .approved span:first-child, .pending span:first-child, .cancelled span:first-child, .line-chart-area, .line-chart-area::before, .chart-path, .tooltip-point, .tooltip-label, .donut-chart-placeholder, .donut-chart-placeholder::after, .lot-info, .lot-info .total, .lot-legend, .legend-item, .legend-color, .color-lote-1, .color-lote-2, .color-lote-3, .color-lote-4, .color-lote-5, .color-lote-6, @keyframes growLine, @keyframes spinDonut {
+            /* Copiar e colar todos os estilos de gráficos e resumo aqui */
+            /* Devido ao limite de tamanho, estou omitindo os estilos de gráfico aqui,
+               mas **você deve garantir que eles estão presentes** no código final para que o Resumo funcione.
+               Eu os inseri novamente no bloco de código final abaixo. */
+        }
+        
+        /* Os estilos de gráfico do código anterior foram colocados no final do bloco <style> */
+        
+        /* RESPONSIVIDADE */
+        @media (max-width: 1024px) {
+            .dashboard-card { flex-direction: column; }
+            .sidebar { width: 100%; margin-right: 0; flex-direction: row; justify-content: flex-start; overflow-x: auto; padding: 10px 10px; }
+            .sidebar::-webkit-scrollbar { display: none; }
+            .sidebar { -ms-overflow-style: none; scrollbar-width: none; }
+            .sidebar a { padding: 10px 15px; flex-shrink: 0; border-radius: 50px; margin-right: 5px; font-size: 0.85rem; }
+            .sidebar a span { display: none; }
+            .sidebar a .material-symbols-rounded { margin-right: 0; }
+            .sidebar-active::after { display: none; } 
+            .main-content { border-radius: 0 0 var(--border-radius) var(--border-radius); padding: 20px 15px; }
+            .charts-container { grid-template-columns: 1fr; }
+            .financial-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hamburger { display: block; }
+            .content-header { flex-direction: column; align-items: flex-start; }
+            .content-header h2 { margin-bottom: 10px; }
+            .event-actions { margin-top: 10px; }
+            .event-details { flex-wrap: wrap; }
+            .inscription-summary { flex-wrap: wrap; }
+            .summary-box { flex-basis: calc(50% - 10px); }
+        }
+        
+        /* --- ESTILOS DE GRÁFICO INCLUÍDOS NOVAMENTE --- */
+        /* Estes estilos são necessários para a visualização inicial 'Resumo' */
+        .event-details { display: flex; gap: 25px; color: #6b7280; font-size: 0.9rem; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #e5e7eb; }
+        .event-details div { display: flex; align-items: center; }
+        .event-details i { margin-right: 8px; color: var(--light-blue); }
+        .public-badge { font-size: 0.75rem; background-color: #bfdbfe; color: #1e40af; padding: 3px 8px; border-radius: 50px; margin-left: 10px; }
+        .summary-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 15px; color: var(--text-dark); }
+        .inscription-summary { display: flex; gap: 20px; margin-bottom: 30px; }
+        .summary-box { background-color: #f9fafb; padding: 15px 20px; border-radius: 8px; text-align: center; border: 1px solid #e5e7eb; flex-grow: 1; transition: transform 0.3s, box-shadow 0.3s; cursor: default; }
+        .summary-box:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1); }
+        .summary-box span:first-child { display: block; font-size: 1.8rem; font-weight: 700; margin-bottom: 5px; }
+        .approved span:first-child { color: var(--accent-green); }
+        .pending span:first-child { color: var(--accent-orange); }
+        .cancelled span:first-child { color: #ef4444; }
+        .view-data-link { font-size: 0.9rem; font-weight: 500; color: var(--light-blue); margin-bottom: 20px; display: block; }
+        .charts-container { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+        .chart-box { background-color: var(--card-bg); border: 1px solid #e5e7eb; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); }
+        .chart-title { font-size: 1rem; font-weight: 600; margin-bottom: 15px; color: var(--text-dark); }
+        .line-chart-area { position: relative; height: 250px; padding: 10px 0; overflow: hidden; }
+        .line-chart-area::before { content: '20\A15\A10\A5'; white-space: pre; position: absolute; left: 0; top: 5px; font-size: 0.8rem; color: #9ca3af; line-height: 59px; }
+        .chart-path { position: absolute; left: 40px; top: 0; width: calc(100% - 40px); height: 100%; mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 250"><path fill="%23255ff1" fill-opacity="0.1" stroke="%23255ff1" stroke-width="2" d="M0,200 C50,150 100,180 150,120 C200,100 250,160 300,140 C350,120 400,180 450,150 L450,250 L0,250 Z"/></svg>'); mask-size: cover; background: linear-gradient(to bottom, var(--light-blue), var(--primary-blue)); transform-origin: bottom; animation: growLine 1.5s ease-out forwards; }
+        @keyframes growLine { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+        .tooltip-point { position: absolute; left: 60%; top: 40%; transform: translate(-50%, -50%); width: 8px; height: 8px; background-color: var(--light-blue); border: 2px solid white; border-radius: 50%; z-index: 10; }
+        .tooltip-label { position: absolute; left: 60%; top: 25%; transform: translateX(-50%); font-size: 0.75rem; background: #4b5563; color: white; padding: 4px 8px; border-radius: 6px; white-space: nowrap; opacity: 0.9; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .sales-by-lot { display: flex; flex-direction: column; align-items: center; }
+        .donut-chart-placeholder { position: relative; width: 180px; height: 180px; border-radius: 50%; background: conic-gradient(#A78BFA 0% 25%, #10B981 25% 45%, #F59E0B 45% 55%, #3B82F6 55% 70%, #6B7280 70% 85%, #EF4444 85% 100%); margin-bottom: 25px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); animation: spinDonut 1s ease-out; }
+        @keyframes spinDonut { from { transform: rotate(180deg) scale(0.5); opacity: 0; } to { transform: rotate(0deg) scale(1); opacity: 1; } }
+        .donut-chart-placeholder::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 120px; height: 120px; background-color: var(--card-bg); border-radius: 50%; }
+        .lot-info { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; font-size: 0.8rem; font-weight: 500; }
+        .lot-info .total { font-size: 1.8rem; font-weight: 700; color: var(--primary-blue); line-height: 1; margin-bottom: 5px; }
+        .lot-legend { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 20px; width: 100%; max-width: 300px; margin-top: 15px; }
+        .legend-item { display: flex; align-items: center; font-size: 0.8rem; color: #4b5563; }
+        .legend-color { width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; transition: transform 0.2s; }
+        .color-lote-1 { background-color: #A78BFA; } .color-lote-2 { background-color: #10B981; } .color-lote-3 { background-color: #F59E0B; } .color-lote-4 { background-color: #3B82F6; } .color-lote-5 { background-color: #6B7280; } .color-lote-6 { background-color: #EF4444; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <nav>
+                <a href="index.html" class="logo">Compete<span>+</span></a>
+                <div class="nav-links">
+                    <a href="index.html">Início</a>
+                    <a href="eventos.html">Eventos</a>
+                    <a href="organizador.html" class="active">Sou Organizador</a>
+                    <a href="inscricoes.html">Minhas Inscrições</a>
+                    <a href="perfil.html">Minha Conta</a>
+                    <a href="criarevento.html" class="btn-nav">Criar Evento →</a>
+                </div>
+                <div class="hamburger"><i class="fas fa-bars"></i></div>
+            </nav>
+        </header>
+    </div>
+
+    <div class="container dashboard-container" style="margin-bottom: 5%;">
+        <div class="dashboard-card">
+            
+            <aside class="sidebar" id="sidebar">
+                <a href="#" data-section="resumo" class="sidebar-active">
+                    <span class="material-symbols-rounded">dashboard</span>Resumo
+                </a>
+                <a href="#" data-section="pagina-evento">
+                    <span class="material-symbols-rounded">description</span>Página do evento
+                </a>
+                <a href="#" data-section="inscricoes">
+                    <span class="material-symbols-rounded">mail</span>Inscrições
+                </a>
+                <a href="#" data-section="participantes">
+                    <span class="material-symbols-rounded">group</span>Participantes
+                </a>
+                <a href="#" data-section="checkin">
+                    <span class="material-symbols-rounded">fact_check</span>Check-in
+                </a>
+                <a href="#" data-section="financeiro">
+                    <span class="material-symbols-rounded">paid</span>Financeiro
+                </a>
+                <a href="#" data-section="niveis-acesso">
+                    <span class="material-symbols-rounded">signal_cellular_alt</span>Níveis de acesso
+                </a>
+                <a href="#" data-section="ficha-medica">
+                    <span class="material-symbols-rounded">medical_information</span>Ficha médica
+                </a>
+            </aside>
+
+            <main class="main-content" id="main-content">
+                </main>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-logo">Compete<span>+</span></div>
+            <div class="footer-links">
+                <a href="#">Serviços</a>
+                <a href="#">Conteúdo</a>
+                <a href="#">Contato</a>
+            </div>
+            <p class="copyright">2025 - Compete+ • Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const eventTitle = "Desafio Corrida pela Vida";
+
+        // --- 1. Funções de Conteúdo para cada Seção ---
+        
+        // Conteúdo do Resumo (Dashboard Inicial)
+        function getResumoContent() {
+            return `
+                <div class="content-header">
+                    <h2 style="font-size: 1.5rem;">Resumo do evento: ${eventTitle}</h2>
+                    <div class="content-actions">
+                        <span class="event-status" style="margin-right: 15px; font-weight: 600; color: var(--accent-green);">Publicado</span>
+                        <button class="btn btn-default">Despublicar</button>
+                        <button class="btn btn-primary">Página do evento</button>
+                    </div>
+                </div>
+                
+                <div class="event-details">
+                    <div><i class="far fa-clock"></i>25 de dezembro de 2025 08h00 - 12h00</div>
+                    <div><i class="fas fa-map-marker-alt"></i>Araranguá/SC</div>
+                    <div><i class="far fa-eye"></i>Visualizações: **2.7K**</div>
+                    <div><i class="far fa-heart"></i>Favoritados: **100**</div>
+                    <div><i class="fas fa-lock-open"></i>Visibilidade: <span class="public-badge">Pública</span></div>
+                </div>
+                
+                <div class="summary-title">Resumo de inscrições</div>
+                <div class="inscription-summary">
+                    <div class="summary-box approved">
+                        <span>186</span>
+                        <span>Inscrições aprovadas</span>
+                    </div>
+                    <div class="summary-box pending">
+                        <span>15</span>
+                        <span>Inscrições pendentes</span>
+                    </div>
+                    <div class="summary-box cancelled">
+                        <span>0</span>
+                        <span>Inscrições canceladas</span>
+                    </div>
+                </div>
+                
+                <a href="#" class="view-data-link">Ver todos os dados das inscrições</a>
+
+                <div class="charts-container">
+                    <div class="chart-box">
+                        <div class="chart-title">Vendas de inscrições por dia</div>
+                        <div class="line-chart-area">
+                            <div class="chart-path"></div>
+                            <div class="tooltip-point"></div>
+                            <div class="tooltip-label">13 inscrições vendidas</div>
+                            <div style="position: absolute; bottom: 0; left: 40px; right: 0; display: flex; justify-content: space-around; font-size: 0.8rem; color: #6b7280; border-top: 1px solid #e5e7eb; padding-top: 5px;">
+                                <span>4 Abr</span><span>8 Abr</span><span>12 Abr</span><span>16 Abr</span><span>20 Abr</span><span>24 Abr</span><span>28 Abr</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-box sales-by-lot">
+                        <div class="chart-title">Vendas de inscrições por lote</div>
+                        <div class="donut-chart-placeholder">
+                            <div class="lot-info"><span class="total">34</span>total de inscrições vendidas<div style="font-size: 0.7rem; color: #4b5563;">6 lotes</div></div>
+                        </div>
+                        <div class="lot-legend">
+                            <div class="legend-item"><span class="legend-color color-lote-1"></span>Lote 1 <span style="font-weight: 600; margin-left: 5px;">15</span></div>
+                            <div class="legend-item"><span class="legend-color color-lote-2"></span>Lote 2 <span style="font-weight: 600; margin-left: 5px;">08</span></div>
+                            <div class="legend-item"><span class="legend-color color-lote-3"></span>Lote 3 <span style="font-weight: 600; margin-left: 5px;">02</span></div>
+                            <div class="legend-item"><span class="legend-color color-lote-4"></span>Lote 4 <span style="font-weight: 600; margin-left: 5px;">04</span></div>
+                            <div class="legend-item"><span class="legend-color color-lote-5"></span>Lote 5 <span style="font-weight: 600; margin-left: 5px;">03</span></div>
+                            <div class="legend-item"><span class="legend-color color-lote-6"></span>Lote 6 <span style="font-weight: 600; margin-left: 5px;">02</span></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Conteúdo da Página do Evento
+        function getPaginaEventoContent() {
+            return `
+                <div class="content-header">
+                    <h2>Página do Evento</h2>
+                    <div class="content-actions">
+                        <button class="btn btn-primary">Salvar Alterações</button>
+                    </div>
+                </div>
+                <div class="page-editor">
+                    <i class="fas fa-edit" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                    <h3>Editor Visual da Página</h3>
+                    <p>Aqui você edita banners, descrição, regulamento e todos os detalhes visuais do evento.</p>
+                    <div style="margin-top: 20px;">
+                        <button class="btn btn-default" style="margin-right: 10px;">Pré-visualizar</button>
+                        <button class="btn btn-primary">Publicar</button>
+                    </div>
+                </div>
+                <div style="margin-top: 20px; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px;">
+                    <div style="font-weight: 600;">URL do Evento:</div>
+                    <a href="#" style="color: var(--light-blue); font-size: 0.9rem;">https://competeplus.com.br/evento/${eventTitle.toLowerCase().replace(/ /g, '-')}</a>
+                </div>
+            `;
+        }
+
+        // Conteúdo de Inscrições
+        function getInscricoesContent() {
+            return `
+                <div class="content-header">
+                    <h2>Inscrições - Filtros e Lotes</h2>
+                    <div class="content-actions">
+                        <button class="btn btn-default"><i class="fas fa-plus"></i> Novo Lote</button>
+                        <button class="btn btn-primary"><i class="fas fa-download"></i> Exportar Dados</button>
+                    </div>
+                </div>
+                
+                <p style="color: #6b7280; margin-bottom: 15px;">Visão detalhada de todos os lotes, preços e datas de virada.</p>
+
+                <table class="table-view">
+                    <thead>
+                        <tr>
+                            <th>Lote</th>
+                            <th>Preço (R$)</th>
+                            <th>Início</th>
+                            <th>Fim</th>
+                            <th>Inscritos</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Lote 1 (Super Promo)</td>
+                            <td>49,90</td>
+                            <td>01/01/2025</td>
+                            <td>31/01/2025</td>
+                            <td>15/20</td>
+                            <td><span class="badge badge-green">ATIVO</span></td>
+                        </tr>
+                        <tr>
+                            <td>Lote 2 (Normal)</td>
+                            <td>69,90</td>
+                            <td>01/02/2025</td>
+                            <td>28/02/2025</td>
+                            <td>8/50</td>
+                            <td><span class="badge badge-green">ATIVO</span></td>
+                        </tr>
+                        <tr>
+                            <td>Lote 3 (Última Chance)</td>
+                            <td>99,90</td>
+                            <td>01/03/2025</td>
+                            <td>20/12/2025</td>
+                            <td>0/50</td>
+                            <td><span class="badge badge-orange">PROGRAMADO</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            `;
+        }
+        
+        // Conteúdo de Participantes
+        function getParticipantesContent() {
+            return `
+                <div class="content-header">
+                    <h2>Lista de Participantes (186 Aprovados)</h2>
+                    <div class="content-actions">
+                        <input type="text" placeholder="Buscar participante..." style="padding: 8px; border: 1px solid #ccc; border-radius: 8px; margin-right: 10px;">
+                        <button class="btn btn-primary"><i class="fas fa-download"></i> Exportar CSV</button>
+                    </div>
+                </div>
+                
+                <table class="table-view">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>CPF</th>
+                            <th>Categoria</th>
+                            <th>Status Pag.</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>João Silva</td>
+                            <td>***.456.***-**</td>
+                            <td>Corrida 10km</td>
+                            <td><span class="badge badge-green">Aprovado</span></td>
+                            <td><i class="fas fa-eye" style="cursor: pointer; color: var(--light-blue);"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Maria Oliveira</td>
+                            <td>***.789.***-**</td>
+                            <td>Corrida 5km</td>
+                            <td><span class="badge badge-orange">Pendente</span></td>
+                            <td><i class="fas fa-eye" style="cursor: pointer; color: var(--light-blue);"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Carlos Santos</td>
+                            <td>***.123.***-**</td>
+                            <td>Corrida 10km</td>
+                            <td><span class="badge badge-green">Aprovado</span></td>
+                            <td><i class="fas fa-eye" style="cursor: pointer; color: var(--light-blue);"></i></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="text-align: center; margin-top: 20px; color: #6b7280; font-size: 0.85rem;">Exibindo 1 a 3 de 186 participantes.</p>
+            `;
+        }
+
+        // Conteúdo de Check-in
+        function getCheckinContent() {
+            return `
+                <div class="content-header">
+                    <h2>Configurações de Check-in</h2>
+                    <div class="content-actions">
+                        <button class="btn btn-primary">Salvar Configurações</button>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div>
+                        <h3>Ativar Check-in por QR Code</h3>
+                        <p>Permite que os participantes façam o check-in através de um código QR.</p>
+                    </div>
+                    <button>Ativar</button>
+                </div>
+                <div class="setting-item">
+                    <div>
+                        <h3>Disponibilizar App de Check-in</h3>
+                        <p>Baixe o aplicativo para a equipe fazer o check-in manualmente.</p>
+                    </div>
+                    <button>Baixar</button>
+                </div>
+                <div class="setting-item">
+                    <div>
+                        <h3>Permitir Check-in Antecipado</h3>
+                        <p>O check-in pode ser feito 24h antes do evento.</p>
+                    </div>
+                    <button style="background-color: #ef4444;">Desativar</button>
+                </div>
+            `;
+        }
+
+        // Conteúdo Financeiro
+        function getFinanceiroContent() {
+            return `
+                <div class="content-header">
+                    <h2>Visão Geral Financeira</h2>
+                    <div class="content-actions">
+                        <button class="btn btn-default"><i class="fas fa-download"></i> Relatório Completo</button>
+                    </div>
+                </div>
+                
+                <div class="financial-grid">
+                    <div class="finance-card card-green">
+                        <h3>Faturamento Bruto</h3>
+                        <p>R$ 12.500,00</p>
+                    </div>
+                    <div class="finance-card card-blue">
+                        <h3>Tarifas/Taxas</h3>
+                        <p>R$ 625,00</p>
+                    </div>
+                    <div class="finance-card card-orange">
+                        <h3>A Receber (Líquido)</h3>
+                        <p>R$ 11.875,00</p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <h3 style="color: var(--text-dark); margin-bottom: 15px;">Extrato de Pagamentos</h3>
+                    <table class="table-view">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Tipo</th>
+                                <th>Descrição</th>
+                                <th>Valor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>20/11/2025</td>
+                                <td><span class="badge badge-green">CRÉDITO</span></td>
+                                <td>Transferência de Inscrições</td>
+                                <td style="color: var(--accent-green); font-weight: 600;">+ R$ 2.500,00</td>
+                            </tr>
+                            <tr>
+                                <td>01/11/2025</td>
+                                <td><span class="badge badge-orange">DÉBITO</span></td>
+                                <td>Taxa de Serviço Mensal</td>
+                                <td style="color: #ef4444; font-weight: 600;">- R$ 50,00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        // Conteúdo de Níveis de Acesso
+        function getNiveisAcessoContent() {
+             return `
+                <div class="content-header">
+                    <h2>Gestão de Níveis de Acesso</h2>
+                    <div class="content-actions">
+                        <button class="btn btn-primary"><i class="fas fa-plus"></i> Novo Usuário</button>
+                    </div>
+                </div>
+                
+                <p style="color: #6b7280; margin-bottom: 15px;">Defina permissões para sua equipe de organização.</p>
+                
+                <table class="table-view">
+                    <thead>
+                        <tr>
+                            <th>Usuário</th>
+                            <th>Nível</th>
+                            <th>Permissões</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Ricardo P.</td>
+                            <td><span class="badge badge-green">Administrador</span></td>
+                            <td>Total</td>
+                            <td><i class="fas fa-user-edit" style="cursor: pointer; color: var(--light-blue);"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Patrícia S.</td>
+                            <td><span class="badge badge-orange">Check-in / Ajuda</span></td>
+                            <td>Acesso ao Check-in e Participantes</td>
+                            <td><i class="fas fa-user-edit" style="cursor: pointer; color: var(--light-blue);"></i></td>
+                        </tr>
+                    </tbody>
+                </table>
+            `;
+        }
+        
+        // Conteúdo de Ficha Médica
+        function getFichaMedicaContent() {
+             return `
+                <div class="content-header">
+                    <h2>Ficha Médica (Geral)</h2>
+                    <div class="content-actions">
+                        <button class="btn btn-primary"><i class="fas fa-download"></i> Exportar Fichas</button>
+                    </div>
+                </div>
+                
+                <p style="color: #ef4444; font-weight: 600; margin-bottom: 20px;">Alerta: 5 participantes indicaram alergias graves ou condições médicas.</p>
+                
+                <div style="padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px;">
+                    <div style="font-weight: 600; color: var(--text-dark); margin-bottom: 10px;">Configurações do Formulário:</div>
+                    <div class="setting-item" style="border-bottom: none; padding: 10px 0;">
+                        <div>
+                            <h3>Ficha Médica é Obrigatória?</h3>
+                        </div>
+                        <button style="background-color: var(--accent-green);">Sim</button>
+                    </div>
+                    <p style="margin-top: 15px; color: #6b7280; font-size: 0.9rem;">
+                        Você pode visualizar e imprimir as fichas médicas de cada participante na seção "Participantes".
+                    </p>
+                </div>
+            `;
+        }
+
+        // --- 2. Função de Navegação Principal ---
+        
+        // Mapeamento das seções para suas respectivas funções de conteúdo
+        const sectionsMap = {
+            'resumo': getResumoContent,
+            'pagina-evento': getPaginaEventoContent,
+            'inscricoes': getInscricoesContent,
+            'participantes': getParticipantesContent,
+            'checkin': getCheckinContent,
+            'financeiro': getFinanceiroContent,
+            'niveis-acesso': getNiveisAcessoContent,
+            'ficha-medica': getFichaMedicaContent
+        };
+
+        // Função para carregar o conteúdo da seção
+        function loadSection(sectionName) {
+            mainContent.style.opacity = '0'; // Começa o fade-out
+            
+            setTimeout(() => {
+                const contentFunction = sectionsMap[sectionName];
+                if (contentFunction) {
+                    mainContent.innerHTML = contentFunction();
+                } else {
+                    mainContent.innerHTML = `<h2>Seção '${sectionName}' não encontrada.</h2>`;
+                }
+                mainContent.style.opacity = '1'; // Finaliza o fade-in
+
+                // Re-inicializa a animação do gráfico de linha para o Resumo
+                if (sectionName === 'resumo') {
+                    const chartPath = mainContent.querySelector('.chart-path');
+                    if(chartPath) {
+                        chartPath.style.animation = 'none';
+                        void chartPath.offsetWidth; // Força o reflow para reiniciar a animação
+                        chartPath.style.animation = 'growLine 1.5s ease-out forwards';
+                    }
+                }
+
+            }, 300); // Tempo de espera para o efeito de transição
+        }
+
+        // --- 3. Event Listeners ---
+        
+        // Listener para os cliques no menu lateral
+        sidebar.addEventListener('click', (event) => {
+            const link = event.target.closest('a');
+            if (!link) return;
+
+            event.preventDefault();
+            const section = link.getAttribute('data-section');
+            if (!section) return;
+
+            // 1. Remove a classe ativa de todos os links
+            document.querySelectorAll('.sidebar a').forEach(item => {
+                item.classList.remove('sidebar-active');
+            });
+
+            // 2. Adiciona a classe ativa ao link clicado
+            link.classList.add('sidebar-active');
+
+            // 3. Carrega o conteúdo da seção
+            loadSection(section);
+        });
+
+        // Carrega o conteúdo inicial (Resumo) ao iniciar a página
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSection('resumo');
+        });
+    </script>
+</body>
+</html>
