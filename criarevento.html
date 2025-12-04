@@ -1,420 +1,707 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compete Plus - Criar Novo Evento</title>
+    <title>Compete+ | Dashboard do Organizador</title>
     
-    <!-- Fontes do Projeto: Poppins e Merriweather -->
+    <!-- Fontes e Ícones -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
-    <!-- Tailwind CSS (usado para classes utilitárias e responsividade) -->
+    <!-- Tailwind CSS (Para facilitar estilização dos modais e tabelas dinâmicas) -->
     <script src="https://cdn.tailwindcss.com"></script>
 
+    <!-- Configuração de Estilos Originais + Adaptações -->
     <style>
-        /* --- Variáveis de Cor da Identidade Visual Compete+ --- */
         :root {
-            --primary-blue: #1a1054; /* Azul Forte */
-            --light-blue: #255ff1;  /* Azul Claro */
-            --accent-green: #10B981; /* Verde Ação (Botões) */
-            --accent-orange: #F59E0B; /* Laranja (Logo/Destaque) */
-            --text-white: #ffffff;
-            --text-dark: #1F2937;
-            --card-bg: #ffffff;
-            --border-radius: 16px;
+            --primary-blue: #1a1054;
+            --light-blue: #255ff1;
         }
-
+        
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(45deg, var(--primary-blue), var(--light-blue));
-            display: flex;
-            justify-content: center;
-            padding: 20px;
+            background-color: #f4f7fe;
+            margin: 0;
+            overflow: hidden; /* Evita scroll duplo com a sidebar */
         }
 
-        /* --- Estilo do Card Principal --- */
-        .event-card {
-            background-color: var(--card-bg);
-            border-radius: var(--border-radius);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3), 0 0 0 4px rgba(25, 95, 241, 0.1);
+        /* --- Sidebar Customizada --- */
+        .sidebar {
+            background: linear-gradient(180deg, #1a1054 0%, #0f0838 100%);
             transition: all 0.3s ease;
         }
 
-        /* --- Logo --- */
-        .logo-text {
-            font-size: 1.5rem; 
-            font-weight: 800;
-            color: var(--primary-blue);
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: #a0aec0;
+            border-radius: 12px;
+            margin-bottom: 4px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
         }
 
-        .logo-plus {
-            color: var(--accent-orange);
-            font-weight: 900;
-        }
-
-        /* --- Inputs e Ícones --- */
-        .input-field, .textarea-field, .select-field {
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            padding: 10px 12px;
-            transition: all 0.2s;
-            color: var(--text-dark);
-            width: 100%;
-        }
-
-        .input-field:focus, .textarea-field:focus, .select-field:focus {
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 0 3px rgba(26, 16, 84, 0.2);
-            outline: none;
-        }
-        
-        .icon-svg {
-            color: var(--primary-blue);
-            opacity: 0.6;
-        }
-
-        /* Adicionando padding para inputs com ícones */
-        .input-with-icon .input-field {
-            padding-left: 40px;
-        }
-
-        /* --- Botão de Ação (Criar Evento) --- */
-        .btn-create {
-            background-color: var(--accent-orange); /* COR ALTERADA PARA LARANJA */
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
             color: white;
-            font-weight: 600;
-            border-radius: 8px;
-            transition: background-color 0.2s, transform 0.2s;
-            box-shadow: 0 4px 10px rgba(245, 158, 11, 0.4); /* Sombra Laranja */
         }
 
-        .btn-create:hover {
-            background-color: #D97706; /* Laranja mais escuro no hover */
-            transform: translateY(-1px);
+        .nav-item.active-link {
+            background: #255ff1;
+            color: white;
+            box-shadow: 0 4px 12px rgba(37, 95, 241, 0.3);
         }
-        
-        /* Estilo para Botão Desabilitado (Processando...) */
-        .btn-create:disabled {
-            background-color: #D97706; 
-            color: rgba(255, 255, 255, 0.7);
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-            opacity: 1; 
+
+        /* --- Animações --- */
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
+        .animate-slide-up { animation: slideUp 0.4s ease-out forwards; }
+
+        /* --- Utilitários de Scroll --- */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 3px; }
+
+        /* Esconder elementos inicialmente */
+        .hidden-el { display: none !important; }
     </style>
 </head>
-<body class="min-h-screen">
+<body class="flex h-screen">
 
-    <div class="event-card w-full max-w-4xl p-6 sm:p-10 my-8">
-        <!-- Cabeçalho e Logo/Navegação Simples -->
-        <div class="flex justify-between items-center mb-8">
-            <div class="logo-text mb-2">
-                <a href="./index.html">
-                Compete<span class="logo-plus">+</span>
-                </a>
+    <!-- SIDEBAR -->
+    <aside class="sidebar w-64 flex-shrink-0 text-white flex flex-col relative z-20 shadow-2xl">
+        <div class="p-6 flex items-center gap-3 border-b border-white/10">
+            <div class="w-10 h-10 bg-gradient-to-tr from-blue-400 to-blue-600 rounded-lg flex items-center justify-center shadow-lg">
+                <i class="fa-solid fa-trophy text-white text-lg"></i>
             </div>
-            <a href="./index.html" class="text-sm font-medium text-gray-500 hover:text-primary-blue transition duration-150">
-                &larr; Voltar para o Painel
-            </a>
+            <div>
+                <h1 class="font-bold text-xl tracking-wide">Compete+</h1>
+                <p class="text-xs text-blue-200 opacity-80">Área do Organizador</p>
+            </div>
         </div>
+
+        <nav class="flex-1 overflow-y-auto py-6 px-3 space-y-2">
+            <a onclick="app.setSection('resumo')" id="nav-resumo" class="nav-item active-link">
+                <i class="fa-solid fa-chart-pie w-6 text-center"></i>
+                <span>Resumo</span>
+            </a>
+            <a onclick="app.setSection('campeonatos')" id="nav-campeonatos" class="nav-item">
+                <i class="fa-solid fa-medal w-6 text-center"></i>
+                <span>Meus Campeonatos</span>
+            </a>
+            <a onclick="app.setSection('atletas')" id="nav-atletas" class="nav-item">
+                <i class="fa-solid fa-users w-6 text-center"></i>
+                <span>Atletas Inscritos</span>
+            </a>
+            <a onclick="app.setSection('resultados')" id="nav-resultados" class="nav-item">
+                <i class="fa-solid fa-clipboard-list w-6 text-center"></i>
+                <span>Resultados</span>
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-white/10">
+            <div class="bg-white/10 rounded-xl p-4 backdrop-blur-sm flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 flex items-center justify-center font-bold text-sm text-white">O</div>
+                <div class="overflow-hidden">
+                    <p class="text-sm font-medium text-white truncate">Organizador</p>
+                    <p class="text-xs text-gray-300" id="user-id-display">Conectando...</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-1 flex flex-col relative overflow-hidden bg-[#f4f7fe]">
         
-        <h1 class="text-3xl font-bold text-gray-800 border-b pb-3 mb-6">Criar Novo Evento</h1>
-        <p class="text-gray-600 mb-8">Preencha todos os detalhes necessários para listar seu evento na plataforma.</p>
-
-        <form id="createEventForm" class="space-y-8">
-            
-            <!-- SEÇÃO 1: INFORMAÇÕES BÁSICAS -->
-            <fieldset class="border-t border-gray-200 pt-6">
-                <legend class="text-xl font-semibold text-gray-700 mb-4">1. Detalhes Principais</legend>
-                
-                <!-- Nome do Evento -->
-                <div>
-                    <label for="eventName" class="block text-sm font-medium text-gray-700 mb-1">Nome do Evento</label>
-                    <div class="relative input-with-icon">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="h-5 w-5 icon-svg" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-                        </div>
-                        <input type="text" id="eventName" name="eventName" required placeholder="Ex: Maratona Anual Compete 2024"
-                               class="input-field" maxlength="100">
-                    </div>
-                    <p class="text-xs text-gray-500 mt-1">Máximo de 100 caracteres.</p>
+        <!-- Header -->
+        <header class="bg-white/80 backdrop-blur-md h-16 border-b border-gray-200 flex items-center justify-between px-8 sticky top-0 z-10">
+            <h2 class="text-xl font-bold text-[#1a1054]" id="page-title">Dashboard Geral</h2>
+            <div class="flex items-center gap-4">
+                <div class="bg-blue-50 text-[#255ff1] px-3 py-1 rounded-full text-xs font-semibold border border-blue-100 flex items-center">
+                    <span class="w-2 h-2 rounded-full bg-green-500 inline-block mr-1"></span> Online
                 </div>
-                
-                <!-- Descrição Curta -->
-                <div>
-                    <label for="shortDescription" class="block text-sm font-medium text-gray-700 mb-1">Chamada Curta (Para Listagem)</label>
-                    <textarea id="shortDescription" name="shortDescription" required placeholder="Breve resumo do evento para aparecer nos resultados de busca."
-                              class="textarea-field" rows="2" maxlength="250"></textarea>
-                    <p class="text-xs text-gray-500 mt-1">Máximo de 250 caracteres.</p>
-                </div>
+            </div>
+        </header>
 
-                <!-- Descrição Detalhada -->
-                <div>
-                    <label for="detailedDescription" class="block text-sm font-medium text-gray-700 mb-1">Descrição Detalhada do Evento</label>
-                    <textarea id="detailedDescription" name="detailedDescription" required placeholder="Regras, itinerário, premiações e informações completas."
-                              class="textarea-field" rows="5"></textarea>
-                </div>
+        <!-- Content Injection Container -->
+        <div id="main-content" class="flex-1 overflow-y-auto p-8 relative">
+            <!-- O conteúdo será injetado aqui via JavaScript -->
+            <div class="flex items-center justify-center h-full">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#255ff1]"></div>
+            </div>
+        </div>
+    </main>
 
-                <!-- Categoria e Localização (Grid 2 colunas) -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Categoria/Sport -->
+    <!-- --- MODAIS (Escondidos por padrão) --- -->
+
+    <!-- Modal Campeonato -->
+    <div id="modal-campeonato" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden-el items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-slide-up">
+            <div class="bg-[#1a1054] px-6 py-4 flex justify-between items-center">
+                <h3 class="text-white font-bold text-lg" id="modal-camp-title">Novo Campeonato</h3>
+                <button onclick="app.closeModals()" class="text-white/70 hover:text-white"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <form onsubmit="app.saveChampionship(event)" class="p-6 space-y-4">
+                <input type="hidden" id="camp-id">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nome do Evento</label>
+                    <input type="text" id="camp-name" required class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#255ff1] outline-none" placeholder="Ex: Copa Verão">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label for="category" class="block text-sm font-medium text-gray-700 mb-1">Categoria / Esporte</label>
-                        <select id="category" name="category" required class="select-field">
-                            <option value="" disabled selected>Selecione uma categoria</option>
-                            <option value="running">Corrida de Rua</option>
-                            <option value="cycling">Ciclismo</option>
-                            <option value="swimming">Natação</option>
-                            <option value="triathlon">Triathlon</option>
-                            <option value="esports">E-Sports</option>
-                            <option value="other">Outro</option>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Data</label>
+                        <input type="date" id="camp-date" required class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Categoria</label>
+                        <select id="camp-category" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 outline-none">
+                            <option>Profissional</option>
+                            <option>Amador</option>
+                            <option>Sub-20</option>
                         </select>
                     </div>
-
-                    <!-- Localização -->
-                    <div>
-                        <label for="location" class="block text-sm font-medium text-gray-700 mb-1">Nome do Local / Endereço</label>
-                        <div class="relative input-with-icon">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg class="h-5 w-5 icon-svg" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                            </div>
-                            <input type="text" id="location" name="location" required placeholder="Ex: Parque Ibirapuera, São Paulo"
-                                class="input-field">
-                        </div>
-                    </div>
                 </div>
-            </fieldset>
-
-            <!-- SEÇÃO 2: DATA, HORA E LIMITES -->
-            <fieldset class="border-t border-gray-200 pt-6">
-                <legend class="text-xl font-semibold text-gray-700 mb-4">2. Agendamento e Capacidade</legend>
-                
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <!-- Data e Hora Início -->
-                    <div>
-                        <label for="startDate" class="block text-sm font-medium text-gray-700 mb-1">Data e Hora de Início</label>
-                        <input type="datetime-local" id="startDate" name="startDate" required class="input-field">
-                    </div>
-                    
-                    <!-- Data e Hora Fim -->
-                    <div>
-                        <label for="endDate" class="block text-sm font-medium text-gray-700 mb-1">Data e Hora de Fim</label>
-                        <input type="datetime-local" id="endDate" name="endDate" required class="input-field">
-                    </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Status</label>
+                    <select id="camp-status" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 outline-none">
+                        <option value="Aberto">Aberto</option>
+                        <option value="Em Andamento">Em Andamento</option>
+                        <option value="Finalizado">Finalizado</option>
+                    </select>
                 </div>
-                
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
-                    <!-- Limite de Participantes -->
-                    <div>
-                        <label for="maxParticipants" class="block text-sm font-medium text-gray-700 mb-1">Capacidade Máxima de Participantes</label>
-                        <div class="relative input-with-icon">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg class="h-5 w-5 icon-svg" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="17" y1="12" x2="17" y2="12"/><line x1="21" y1="12" x2="21" y2="12"/><line x1="19" y1="14" x2="19" y2="10"/></svg>
-                            </div>
-                            <input type="number" id="maxParticipants" name="maxParticipants" required min="1" placeholder="Ex: 500"
-                                class="input-field">
-                        </div>
-                    </div>
-
-                    <!-- Preço da Inscrição -->
-                    <div>
-                        <label for="registrationPrice" class="block text-sm font-medium text-gray-700 mb-1">Preço da Inscrição (R$)</label>
-                        <div class="relative input-with-icon">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <span class="text-gray-500 font-semibold icon-svg">R$</span>
-                            </div>
-                            <input type="number" id="registrationPrice" name="registrationPrice" required min="0" step="0.01" placeholder="0.00 (Grátis)"
-                                class="input-field">
-                        </div>
-                        <p class="text-xs text-gray-500 mt-1">Use 0.00 para eventos gratuitos.</p>
-                    </div>
+                <div class="pt-4 flex justify-end gap-3">
+                    <button type="button" onclick="app.closeModals()" class="px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-lg">Cancelar</button>
+                    <button type="submit" class="px-6 py-2 bg-[#255ff1] text-white font-bold rounded-lg hover:bg-blue-700">Salvar</button>
                 </div>
-            </fieldset>
-
-            <!-- SEÇÃO 3: CONTATO E CONFIRMAÇÃO -->
-            <fieldset class="border-t border-gray-200 pt-6">
-                <legend class="text-xl font-semibold text-gray-700 mb-4">3. Informações de Contato</legend>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Email de Contato -->
-                    <div>
-                        <label for="contactEmail" class="block text-sm font-medium text-gray-700 mb-1">E-mail de Contato (Suporte)</label>
-                        <div class="relative input-with-icon">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg class="h-5 w-5 icon-svg" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-                            </div>
-                            <input type="email" id="contactEmail" name="contactEmail" required placeholder="suporte@seuevento.com.br"
-                                class="input-field">
-                        </div>
-                    </div>
-
-                    <!-- Telefone de Contato -->
-                    <div>
-                        <label for="contactPhone" class="block text-sm font-medium text-gray-700 mb-1">Telefone de Contato</label>
-                        <div class="relative input-with-icon">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg class="h-5 w-5 icon-svg" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 3.08 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                            </div>
-                            <input type="tel" id="contactPhone" name="contactPhone" placeholder="(XX) 9XXXX-XXXX"
-                                class="input-field">
-                        </div>
-                    </div>
-                </div>
-            </fieldset>
-
-            <!-- Área de Mensagem (Feedback) -->
-            <div id="messageBox" class="hidden p-3 rounded-lg text-sm font-medium" role="alert">
-                <p id="messageText"></p>
-            </div>
-
-            <!-- Botão de Ação -->
-            <div class="pt-4">
-                <button type="submit" id="createButton"
-                        class="btn-create w-full py-3 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-400">
-                    Criar Evento e Enviar para Aprovação
-                </button>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const form = document.getElementById('createEventForm');
-            const messageBox = document.getElementById('messageBox');
-            const messageText = document.getElementById('messageText');
-            const createButton = document.getElementById('createButton');
-            
-            // Referências aos campos de data
-            const startDateField = document.getElementById('startDate');
-            const endDateField = document.getElementById('endDate');
+    <!-- Modal Atleta -->
+    <div id="modal-atleta" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden-el items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-slide-up">
+            <div class="bg-[#10B981] px-6 py-4 flex justify-between items-center">
+                <h3 class="text-white font-bold text-lg" id="modal-atleta-title">Novo Atleta</h3>
+                <button onclick="app.closeModals()" class="text-white/70 hover:text-white"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <form onsubmit="app.saveAthlete(event)" class="p-6 space-y-4">
+                <input type="hidden" id="atleta-id">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nome Completo</label>
+                    <input type="text" id="atleta-name" required class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 outline-none focus:border-green-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Equipe / Time</label>
+                    <input type="text" id="atleta-team" required class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 outline-none focus:border-green-500">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Categoria</label>
+                        <select id="atleta-category" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 outline-none">
+                            <option>Leve</option>
+                            <option>Médio</option>
+                            <option>Pesado</option>
+                            <option>Absoluto</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Status</label>
+                        <select id="atleta-status" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 outline-none">
+                            <option>Ativo</option>
+                            <option>Pendente</option>
+                            <option>Suspenso</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="pt-4 flex justify-end gap-3">
+                    <button type="button" onclick="app.closeModals()" class="px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-lg">Cancelar</button>
+                    <button type="submit" class="px-6 py-2 bg-[#10B981] text-white font-bold rounded-lg hover:bg-green-600">Salvar Atleta</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-            // Define a data mínima para o início do evento (hoje)
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            startDateField.min = `${year}-${month}-${day}T${hours}:${minutes}`;
+    <!-- Modal Resultado -->
+    <div id="modal-resultado" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden-el items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-slide-up">
+            <div class="bg-gradient-to-r from-[#1a1054] to-[#2a2070] px-6 py-4 flex justify-between items-center">
+                <h3 class="text-white font-bold text-lg">Registrar Resultado</h3>
+                <button onclick="app.closeModals()" class="text-white/70 hover:text-white"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <form onsubmit="app.saveResult(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Campeonato</label>
+                    <select id="res-camp" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 outline-none"></select>
+                </div>
+                <div class="flex items-center justify-between gap-2 p-4 bg-gray-50 rounded-xl border border-gray-100">
+                    <div class="flex-1">
+                        <input type="text" id="res-a-name" required placeholder="Atleta A" class="w-full text-center bg-white border border-gray-200 rounded px-2 py-1 text-sm font-bold mb-2">
+                        <input type="number" id="res-a-score" required placeholder="0" class="w-full text-center text-2xl font-bold bg-transparent border-none focus:ring-0">
+                    </div>
+                    <span class="text-gray-400 font-bold text-xl">X</span>
+                    <div class="flex-1">
+                        <input type="text" id="res-b-name" required placeholder="Atleta B" class="w-full text-center bg-white border border-gray-200 rounded px-2 py-1 text-sm font-bold mb-2">
+                        <input type="number" id="res-b-score" required placeholder="0" class="w-full text-center text-2xl font-bold bg-transparent border-none focus:ring-0">
+                    </div>
+                </div>
+                <div class="pt-4 flex justify-end gap-3">
+                    <button type="button" onclick="app.closeModals()" class="px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-lg">Cancelar</button>
+                    <button type="submit" class="px-6 py-2 bg-[#1a1054] text-white font-bold rounded-lg hover:bg-blue-900">Confirmar Placar</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
+    <!-- Modal Delete -->
+    <div id="modal-delete" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden-el items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 animate-slide-up border-t-4 border-red-500">
+            <div class="flex flex-col items-center text-center">
+                <div class="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mb-4 text-red-500 text-2xl">
+                    <i class="fa-solid fa-trash-can"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Excluir Item?</h3>
+                <p class="text-gray-500 text-sm mb-6" id="delete-msg">Você tem certeza?</p>
+                <div class="flex gap-3 w-full">
+                    <button onclick="app.cancelDelete()" class="flex-1 py-2.5 bg-gray-100 text-gray-600 font-semibold rounded-lg hover:bg-gray-200">Cancelar</button>
+                    <button onclick="app.confirmDelete()" class="flex-1 py-2.5 bg-red-500 text-white font-bold rounded-lg hover:bg-red-600 shadow-lg shadow-red-500/30">Sim, Excluir</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-            // Função para exibir mensagens (erro ou sucesso)
-            function showMessage(text, isError = true) {
-                messageText.textContent = text;
-                messageBox.classList.remove('hidden', 'bg-red-100', 'bg-green-100', 'border-red-400', 'border-green-400', 'text-red-700', 'text-green-700');
-                
-                if (isError) {
-                    messageBox.classList.add('bg-red-100', 'border', 'border-red-400', 'text-red-700');
+    <!-- LÓGICA JAVASCRIPT E FIREBASE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, setDoc, deleteDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Configurações
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : undefined;
+
+        // Inicialização Firebase
+        const firebaseApp = initializeApp(firebaseConfig);
+        const auth = getAuth(firebaseApp);
+        const db = getFirestore(firebaseApp);
+
+        // Estado Global da Aplicação
+        const state = {
+            user: null,
+            currentSection: 'resumo',
+            data: {
+                championships: [],
+                athletes: [],
+                results: []
+            },
+            deleteTarget: null // { id, collection }
+        };
+
+        // --- AUTH ---
+        async function initAuth() {
+            try {
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
                 } else {
-                    messageBox.classList.add('bg-green-100', 'border', 'border-green-400', 'text-green-700');
+                    await signInAnonymously(auth);
                 }
+            } catch (error) {
+                console.error("Erro auth:", error);
+            }
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                state.user = user;
+                document.getElementById('user-id-display').textContent = `ID: ${user.uid.slice(0, 8)}...`;
+                initDataListeners(user.uid);
+            } else {
+                document.getElementById('main-content').innerHTML = '<div class="p-8 text-center text-red-500">Erro de autenticação. Recarregue a página.</div>';
+            }
+        });
+
+        // --- LISTENERS (TEMPO REAL) ---
+        function initDataListeners(uid) {
+            // Campeonatos
+            const qCamps = query(collection(db, `artifacts/${appId}/users/${uid}/championships`), orderBy('date', 'desc'));
+            onSnapshot(qCamps, (snap) => {
+                state.data.championships = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderIfActive('resumo', 'campeonatos', 'resultados'); // Resultados depende dos nomes dos campeonatos
+            });
+
+            // Atletas
+            const qAthletes = query(collection(db, `artifacts/${appId}/users/${uid}/athletes`), orderBy('name'));
+            onSnapshot(qAthletes, (snap) => {
+                state.data.athletes = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderIfActive('resumo', 'atletas');
+            });
+
+            // Resultados
+            const qResults = collection(db, `artifacts/${appId}/users/${uid}/results`);
+            onSnapshot(qResults, (snap) => {
+                state.data.results = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderIfActive('resumo', 'resultados');
+            });
+        }
+
+        function renderIfActive(...sections) {
+            if (sections.includes(state.currentSection)) {
+                renderSection(state.currentSection);
+            }
+        }
+
+        // --- RENDERIZAÇÃO ---
+        
+        window.app = {
+            // Navegação
+            setSection: (sec) => {
+                state.currentSection = sec;
                 
-                messageBox.classList.remove('hidden');
+                // Atualiza Sidebar UI
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active-link'));
+                document.getElementById(`nav-${sec}`).classList.add('active-link');
                 
-                setTimeout(() => {
-                    messageBox.classList.add('hidden');
-                }, 7000);
+                // Atualiza Título
+                const titles = {
+                    'resumo': 'Dashboard Geral',
+                    'campeonatos': 'Gestão de Campeonatos',
+                    'atletas': 'Base de Atletas',
+                    'resultados': 'Central de Resultados'
+                };
+                document.getElementById('page-title').textContent = titles[sec];
+
+                renderSection(sec);
+            },
+
+            // Modais
+            closeModals: () => {
+                document.querySelectorAll('[id^="modal-"]').forEach(el => {
+                    el.classList.remove('flex');
+                    el.classList.add('hidden-el');
+                });
+            },
+
+            // --- FUNÇÕES DE AÇÃO (CRUD) ---
+
+            // CAMPEONATOS
+            openChampionshipModal: (id = null) => {
+                const modal = document.getElementById('modal-campeonato');
+                const title = document.getElementById('modal-camp-title');
+                
+                // Reset form
+                document.getElementById('camp-id').value = '';
+                document.getElementById('camp-name').value = '';
+                document.getElementById('camp-date').value = new Date().toISOString().split('T')[0];
+                document.getElementById('camp-category').value = 'Profissional';
+                document.getElementById('camp-status').value = 'Aberto';
+
+                if (id) {
+                    const item = state.data.championships.find(c => c.id === id);
+                    if (item) {
+                        document.getElementById('camp-id').value = item.id;
+                        document.getElementById('camp-name').value = item.name;
+                        document.getElementById('camp-date').value = item.date;
+                        document.getElementById('camp-category').value = item.category;
+                        document.getElementById('camp-status').value = item.status;
+                        title.textContent = 'Editar Campeonato';
+                    }
+                } else {
+                    title.textContent = 'Novo Campeonato';
+                }
+
+                modal.classList.remove('hidden-el');
+                modal.classList.add('flex');
+            },
+
+            saveChampionship: async (e) => {
+                e.preventDefault();
+                const id = document.getElementById('camp-id').value;
+                const data = {
+                    name: document.getElementById('camp-name').value,
+                    date: document.getElementById('camp-date').value,
+                    category: document.getElementById('camp-category').value,
+                    status: document.getElementById('camp-status').value
+                };
+
+                const col = collection(db, `artifacts/${appId}/users/${state.user.uid}/championships`);
+                
+                app.closeModals();
+                if (id) {
+                    await setDoc(doc(col, id), data);
+                } else {
+                    await addDoc(col, data);
+                }
+            },
+
+            // ATLETAS
+            openAthleteModal: (id = null) => {
+                const modal = document.getElementById('modal-atleta');
+                const title = document.getElementById('modal-atleta-title');
+                
+                document.getElementById('atleta-id').value = '';
+                document.getElementById('atleta-name').value = '';
+                document.getElementById('atleta-team').value = '';
+                document.getElementById('atleta-category').value = 'Leve';
+                document.getElementById('atleta-status').value = 'Ativo';
+
+                if (id) {
+                    const item = state.data.athletes.find(a => a.id === id);
+                    if (item) {
+                        document.getElementById('atleta-id').value = item.id;
+                        document.getElementById('atleta-name').value = item.name;
+                        document.getElementById('atleta-team').value = item.team;
+                        document.getElementById('atleta-category').value = item.category;
+                        document.getElementById('atleta-status').value = item.status;
+                        title.textContent = 'Editar Atleta';
+                    }
+                } else {
+                    title.textContent = 'Novo Atleta';
+                }
+
+                modal.classList.remove('hidden-el');
+                modal.classList.add('flex');
+            },
+
+            saveAthlete: async (e) => {
+                e.preventDefault();
+                const id = document.getElementById('atleta-id').value;
+                const data = {
+                    name: document.getElementById('atleta-name').value,
+                    team: document.getElementById('atleta-team').value,
+                    category: document.getElementById('atleta-category').value,
+                    status: document.getElementById('atleta-status').value
+                };
+
+                const col = collection(db, `artifacts/${appId}/users/${state.user.uid}/athletes`);
+                
+                app.closeModals();
+                if (id) {
+                    await setDoc(doc(col, id), data);
+                } else {
+                    await addDoc(col, data);
+                }
+            },
+
+            // RESULTADOS
+            openResultModal: () => {
+                const modal = document.getElementById('modal-resultado');
+                const select = document.getElementById('res-camp');
+                
+                // Popular select
+                select.innerHTML = state.data.championships.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+                
+                document.getElementById('res-a-name').value = '';
+                document.getElementById('res-a-score').value = '';
+                document.getElementById('res-b-name').value = '';
+                document.getElementById('res-b-score').value = '';
+
+                modal.classList.remove('hidden-el');
+                modal.classList.add('flex');
+            },
+
+            saveResult: async (e) => {
+                e.preventDefault();
+                const sA = Number(document.getElementById('res-a-score').value);
+                const sB = Number(document.getElementById('res-b-score').value);
+                const nameA = document.getElementById('res-a-name').value;
+                const nameB = document.getElementById('res-b-name').value;
+
+                let winner = 'Empate';
+                if (sA > sB) winner = nameA;
+                else if (sB > sA) winner = nameB;
+
+                const data = {
+                    championshipName: document.getElementById('res-camp').value,
+                    athleteA: nameA,
+                    scoreA: sA,
+                    athleteB: nameB,
+                    scoreB: sB,
+                    winner: winner
+                };
+
+                const col = collection(db, `artifacts/${appId}/users/${state.user.uid}/results`);
+                app.closeModals();
+                await addDoc(col, data);
+            },
+
+            // EXCLUSÃO
+            requestDelete: (id, type, name) => {
+                state.deleteTarget = { id, type };
+                const modal = document.getElementById('modal-delete');
+                document.getElementById('delete-msg').innerHTML = `Deseja remover <strong>"${name}"</strong>?`;
+                modal.classList.remove('hidden-el');
+                modal.classList.add('flex');
+            },
+
+            confirmDelete: async () => {
+                if (!state.deleteTarget) return;
+                const { id, type } = state.deleteTarget;
+                const colName = type === 'camp' ? 'championships' : type === 'athlete' ? 'athletes' : 'results';
+                
+                try {
+                    await deleteDoc(doc(db, `artifacts/${appId}/users/${state.user.uid}/${colName}/${id}`));
+                    app.cancelDelete();
+                } catch (e) {
+                    console.error(e);
+                }
+            },
+
+            cancelDelete: () => {
+                state.deleteTarget = null;
+                const modal = document.getElementById('modal-delete');
+                modal.classList.remove('flex');
+                modal.classList.add('hidden-el');
+            }
+        };
+
+        // --- RENDERIZADORES DE HTML ---
+
+        function renderSection(section) {
+            const container = document.getElementById('main-content');
+            
+            if (section === 'resumo') {
+                const activeCamps = state.data.championships.filter(c => c.status !== 'Finalizado').length;
+                container.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 animate-slide-up">
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-start group hover:shadow-lg transition-all relative overflow-hidden">
+                            <div class="z-10">
+                                <p class="text-gray-500 text-sm font-medium mb-1">Campeonatos Ativos</p>
+                                <h3 class="text-3xl font-bold text-[#1a1054]">${activeCamps}</h3>
+                            </div>
+                            <div class="w-10 h-10 rounded-lg bg-blue-50 text-[#255ff1] flex items-center justify-center z-10"><i class="fa-solid fa-trophy"></i></div>
+                            <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-[#255ff1] to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-start group hover:shadow-lg transition-all relative overflow-hidden">
+                            <div class="z-10">
+                                <p class="text-gray-500 text-sm font-medium mb-1">Total de Atletas</p>
+                                <h3 class="text-3xl font-bold text-[#1a1054]">${state.data.athletes.length}</h3>
+                            </div>
+                            <div class="w-10 h-10 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center z-10"><i class="fa-solid fa-users"></i></div>
+                            <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-purple-600 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+                        </div>
+                         <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-start group hover:shadow-lg transition-all relative overflow-hidden">
+                            <div class="z-10">
+                                <p class="text-gray-500 text-sm font-medium mb-1">Partidas</p>
+                                <h3 class="text-3xl font-bold text-[#1a1054]">${state.data.results.length}</h3>
+                            </div>
+                            <div class="w-10 h-10 rounded-lg bg-green-50 text-green-600 flex items-center justify-center z-10"><i class="fa-solid fa-check-circle"></i></div>
+                            <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-green-600 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 animate-slide-up">
+                        <h3 class="text-lg font-bold text-[#1a1054] mb-4">Bem-vindo, Organizador!</h3>
+                        <p class="text-gray-500">Selecione uma opção no menu lateral para começar a gerenciar seus eventos.</p>
+                    </div>
+                `;
             }
 
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
+            else if (section === 'campeonatos') {
+                const rows = state.data.championships.map(c => {
+                    const statusClass = c.status === 'Aberto' ? 'bg-green-100 text-green-700' : c.status === 'Em Andamento' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500';
+                    return `
+                        <tr class="hover:bg-blue-50/50 transition-colors group border-b border-gray-50">
+                            <td class="px-6 py-4 font-semibold text-[#1a1054]">${c.name}</td>
+                            <td class="px-6 py-4 text-gray-600">${c.date}</td>
+                            <td class="px-6 py-4 text-gray-600"><span class="px-2 py-1 bg-gray-100 rounded text-xs">${c.category}</span></td>
+                            <td class="px-6 py-4"><span class="${statusClass} px-3 py-1 rounded-full text-xs font-semibold">${c.status}</span></td>
+                            <td class="px-6 py-4 text-right space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button onclick="app.openChampionshipModal('${c.id}')" class="text-blue-500 hover:bg-blue-100 p-2 rounded transition"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="app.requestDelete('${c.id}', 'camp', '${c.name}')" class="text-red-500 hover:bg-red-100 p-2 rounded transition"><i class="fa-solid fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
 
-                // 1. Coleta de dados
-                const eventData = {
-                    name: document.getElementById('eventName').value.trim(),
-                    shortDesc: document.getElementById('shortDescription').value.trim(),
-                    detailedDesc: document.getElementById('detailedDescription').value.trim(),
-                    category: document.getElementById('category').value,
-                    location: document.getElementById('location').value.trim(),
-                    startDate: new Date(startDateField.value),
-                    endDate: new Date(endDateField.value),
-                    maxParticipants: parseInt(document.getElementById('maxParticipants').value),
-                    price: parseFloat(document.getElementById('registrationPrice').value),
-                    contactEmail: document.getElementById('contactEmail').value.trim(),
-                    contactPhone: document.getElementById('contactPhone').value.trim(),
-                };
-                
-                // Desabilitar botão e mostrar loading
-                createButton.disabled = true;
-                createButton.textContent = 'Enviando...';
+                container.innerHTML = `
+                    <div class="space-y-6 animate-slide-up">
+                        <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm">
+                            <div class="relative"><i class="fa-solid fa-search absolute left-3 top-3 text-gray-400 text-sm"></i><input type="text" placeholder="Buscar..." class="pl-10 pr-4 py-2 bg-gray-50 border-none rounded-lg text-sm focus:ring-2 focus:ring-[#255ff1] outline-none"></div>
+                            <button onclick="app.openChampionshipModal()" class="bg-[#255ff1] hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm font-medium shadow-lg shadow-blue-500/30 flex items-center gap-2"><i class="fa-solid fa-plus"></i> Novo Campeonato</button>
+                        </div>
+                        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                            <table class="w-full text-sm text-left"><thead class="bg-gray-50 text-gray-500 font-medium border-b border-gray-100"><tr><th class="px-6 py-4">Nome</th><th class="px-6 py-4">Data</th><th class="px-6 py-4">Categoria</th><th class="px-6 py-4">Status</th><th class="px-6 py-4 text-right">Ações</th></tr></thead>
+                            <tbody>${rows || '<tr><td colspan="5" class="px-6 py-8 text-center text-gray-400">Nenhum campeonato encontrado.</td></tr>'}</tbody></table>
+                        </div>
+                    </div>
+                `;
+            }
 
-                // 2. Validação de regras de negócio
-                let errorMessage = '';
+            else if (section === 'atletas') {
+                const cards = state.data.athletes.map(a => {
+                    const statusClass = a.status === 'Ativo' ? 'text-green-600 bg-green-50 border-green-200' : 'text-red-500 bg-red-50 border-red-200';
+                    return `
+                       <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition relative group">
+                          <div class="flex items-start justify-between mb-3">
+                             <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-xl text-gray-400 font-bold uppercase">${a.name.charAt(0)}</div>
+                             <span class="${statusClass} text-[10px] px-2 py-0.5 rounded-full border uppercase tracking-wider font-bold">${a.status}</span>
+                          </div>
+                          <h4 class="font-bold text-[#1a1054] text-lg">${a.name}</h4>
+                          <p class="text-gray-500 text-sm mb-4">${a.team} • ${a.category}</p>
+                          <div class="pt-3 border-t border-gray-50 flex justify-end gap-2">
+                             <button onclick="app.openAthleteModal('${a.id}')" class="text-xs text-blue-600 font-medium hover:underline">Editar</button>
+                             <button onclick="app.requestDelete('${a.id}', 'athlete', '${a.name}')" class="text-xs text-red-500 font-medium hover:underline">Excluir</button>
+                          </div>
+                       </div>
+                    `;
+                }).join('');
 
-                // Validação de datas
-                if (eventData.startDate >= eventData.endDate) {
-                    errorMessage = 'A data/hora de término deve ser posterior à data/hora de início.';
-                } else if (eventData.startDate <= new Date()) {
-                     errorMessage = 'O evento deve começar no futuro. Verifique a data e hora de início.';
-                } else if (eventData.maxParticipants < 1) {
-                    errorMessage = 'A capacidade máxima deve ser de pelo menos 1 participante.';
-                } else if (eventData.price < 0) {
-                    errorMessage = 'O preço da inscrição não pode ser negativo.';
-                } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(eventData.contactEmail)) {
-                    errorMessage = 'O e-mail de contato é inválido.';
-                }
+                container.innerHTML = `
+                    <div class="space-y-6 animate-slide-up">
+                        <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm">
+                            <h3 class="font-bold text-[#1a1054]">Gerenciar Atletas</h3>
+                            <button onclick="app.openAthleteModal()" class="bg-[#10B981] hover:bg-green-600 text-white px-5 py-2 rounded-lg text-sm font-medium shadow-lg shadow-green-500/30 flex items-center gap-2"><i class="fa-solid fa-user-plus"></i> Novo Atleta</button>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            ${cards || '<div class="col-span-3 text-center py-10 text-gray-400">Nenhum atleta cadastrado.</div>'}
+                        </div>
+                    </div>
+                `;
+            }
 
+            else if (section === 'resultados') {
+                const rows = state.data.results.map(r => `
+                    <tr class="hover:bg-gray-50 border-b border-gray-50">
+                        <td class="px-6 py-4 font-medium text-[#1a1054]">${r.championshipName}</td>
+                        <td class="px-6 py-4 text-center text-gray-600">${r.athleteA} <span class="text-xs text-gray-400 mx-1">VS</span> ${r.athleteB}</td>
+                        <td class="px-6 py-4 text-center font-mono font-bold text-lg">
+                            <span class="${r.scoreA > r.scoreB ? 'text-green-600' : ''}">${r.scoreA}</span> - <span class="${r.scoreB > r.scoreA ? 'text-green-600' : ''}">${r.scoreB}</span>
+                        </td>
+                        <td class="px-6 py-4"><span class="text-green-600 font-bold text-xs bg-green-50 px-2 py-1 rounded border border-green-100"><i class="fa-solid fa-crown mr-1"></i> ${r.winner}</span></td>
+                        <td class="px-6 py-4 text-right"><button onclick="app.requestDelete('${r.id}', 'res', 'Jogo ${r.athleteA} vs ${r.athleteB}')" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td>
+                    </tr>
+                `).join('');
 
-                // Validação de campos obrigatórios (além da validação HTML required)
-                if (eventData.category === "") {
-                    errorMessage = 'Por favor, selecione uma categoria para o evento.';
-                }
+                container.innerHTML = `
+                   <div class="space-y-6 animate-slide-up">
+                      <div class="bg-gradient-to-r from-[#1a1054] to-[#2a2070] text-white p-6 rounded-2xl shadow-lg relative overflow-hidden">
+                         <div class="relative z-10">
+                            <h3 class="text-xl font-bold mb-2">Central de Resultados</h3>
+                            <button onclick="app.openResultModal()" class="bg-white text-[#1a1054] px-4 py-2 rounded-lg text-sm font-bold shadow hover:bg-gray-100 transition mt-2"><i class="fa-solid fa-plus mr-1"></i> Lançar Placar</button>
+                         </div>
+                         <i class="fa-solid fa-trophy text-9xl absolute -right-4 -bottom-4 text-white opacity-5"></i>
+                      </div>
+                      <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+                         <table class="w-full text-sm">
+                            <thead class="bg-gray-50 border-b border-gray-100"><tr><th class="px-6 py-3 text-left">Camp</th><th class="px-6 py-3 text-center">Partida</th><th class="px-6 py-3 text-center">Placar</th><th class="px-6 py-3 text-left">Vencedor</th><th class="px-6 py-3"></th></tr></thead>
+                            <tbody>${rows || '<tr><td colspan="5" class="px-6 py-8 text-center text-gray-400">Nenhum resultado lançado.</td></tr>'}</tbody>
+                         </table>
+                      </div>
+                   </div>
+                `;
+            }
+        }
 
-
-                if (errorMessage) {
-                    showMessage('Erro na validação: ' + errorMessage, true);
-                    
-                    // Re-habilitar botão
-                    createButton.disabled = false;
-                    createButton.textContent = 'Criar Evento e Enviar para Aprovação';
-                    return;
-                }
-
-                // SIMULAÇÃO DE ENVIO DE DADOS (Substitua pela sua lógica de API/Firebase)
-                try {
-                    // Simula um tempo de processamento de rede
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-
-                    // Simula sucesso
-                    console.log("Dados do Evento Enviados:", eventData);
-                    showMessage(`Evento "${eventData.name}" criado com sucesso! Ele foi enviado para aprovação da equipe Compete Plus.`, false);
-                    
-                    // Limpar formulário após 5 segundos, simulando um sucesso e preparando para o próximo
-                    setTimeout(() => {
-                        form.reset();
-                        document.querySelector('a[href="#"]').focus(); // Foca no link Voltar
-                    }, 5000); 
-
-                } catch (error) {
-                    console.error("Erro durante o processo de criação do evento:", error);
-                    showMessage('Ocorreu um erro inesperado ao salvar o evento. Verifique sua conexão.', true);
-                } finally {
-                    // Re-habilitar o botão se não houver redirecionamento ou limpeza de form
-                    if (!errorMessage) {
-                        setTimeout(() => {
-                             createButton.disabled = false;
-                             createButton.textContent = 'Criar Evento e Enviar para Aprovação';
-                        }, 5000); 
-                    } else {
-                        createButton.disabled = false;
-                        createButton.textContent = 'Criar Evento e Enviar para Aprovação';
-                    }
-                }
-            });
-            
-            // Validação em tempo real para data de fim ser depois da data de início
-            startDateField.addEventListener('change', () => {
-                if (startDateField.value) {
-                    endDateField.min = startDateField.value;
-                    if (endDateField.value && new Date(endDateField.value) <= new Date(startDateField.value)) {
-                        endDateField.value = ''; // Limpa se for inválido
-                    }
-                }
-            });
-        });
+        // Inicia
+        initAuth();
     </script>
 </body>
 </html>

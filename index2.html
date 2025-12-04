@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compete+ | Plataforma de Eventos Esportivos</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        /* --- CSS Reset e Variáveis --- */
+        :root {
+            --primary-blue: #1a1054;
+            --light-blue: #255ff1;
+            --accent-green: #10B981;
+            --accent-orange: #F59E0B;
+            --text-white: #ffffff;
+            --text-dark: #1F2937;
+            --card-bg: #ffffff;
+            --border-radius: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(45deg, var(--primary-blue), var(--light-blue));
+            color: var(--text-white);
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            width: 100%;
+        }
+
+        /* --- HEADER (Atualizado para o padrão das outras páginas) --- */
+        header { 
+            padding: 20px 0; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            width: 100%; 
+            z-index: 1000; 
+            display: flex; 
+            justify-content: center; 
+        }
+
+        nav { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: rgba(255, 255, 255, 0.90); 
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px); 
+            border: 1px solid rgba(255, 255, 255, 0.6); 
+            padding: 12px 30px; 
+            border-radius: 50px; 
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15); 
+            width: 100%; 
+            max-width: 1200px; 
+        }
+
+        .logo { 
+            font-size: 1.5rem; 
+            font-weight: 800; 
+            color: var(--primary-blue); 
+            display: flex; 
+            align-items: center; 
+        }
+        .logo span { color: var(--accent-orange); font-weight: 900; }
+
+        .nav-links { display: flex; gap: 30px; align-items: center; }
+
+        .nav-links a { 
+            color: #4b5563; 
+            font-size: 0.95rem; 
+            font-weight: 500; 
+            padding: 8px 12px; 
+            border-radius: 30px; 
+            transition: 0.3s; 
+        }
+
+        .nav-links a:hover:not(.active) { 
+            color: var(--primary-blue); 
+            background-color: rgba(0, 0, 0, 0.05); 
+        }
+
+        .nav-links .active { 
+            color: var(--primary-blue); 
+            font-weight: 600; 
+            background-color: #e2e8f0; 
+        }
+
+        .btn-nav { 
+            background: linear-gradient(135deg, #0ea5e9 0%, #2563EB 100%); 
+            color: white !important; 
+            padding: 10px 28px; 
+            border-radius: 50px; 
+            font-weight: 600 !important; 
+        }
+        
+        .hamburger { 
+            display: none; 
+            font-size: 1.5rem; 
+            color: var(--primary-blue); 
+            cursor: pointer; 
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: center;
+            padding: 140px 0 60px 0; /* Aumentei o padding-top por causa do header fixo */
+            gap: 40px;
+        }
+
+        .hero-content h1 {
+            font-size: 2.5rem;
+            line-height: 1.2;
+            margin-bottom: 30px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .role-card {
+            background: white;
+            color: var(--primary-blue);
+            padding: 2px;
+            border-radius: 20px;
+            width: 160px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .role-card img{
+            width: 100%;
+            height: auto;
+        }
+
+        .role-card:hover { transform: translateY(-5px); }
+        .role-card i { font-size: 2rem; margin-bottom: 10px; display: block; }
+        .role-card span { font-weight: 600; font-size: 0.9rem; }
+
+        .hero-image img {
+            width: 100%;
+            height: 100%;
+            mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+        }
+
+        /* --- Seção de Eventos --- */
+        .events-section {
+            padding: 40px 0;
+        }
+
+        .events-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .filter-btn {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 20px;
+            border-radius: 20px;
+            color: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .event-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            color: var(--text-dark);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .card-image-placeholder {
+            width: 100%;
+            height: 180px;
+            background-color: #e5e7eb;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #9ca3af;
+        }
+        
+        .card-image-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .date-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: white;
+            padding: 5px 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .event-info { padding-top: 15px; }
+        .event-info h3 { font-size: 1rem; margin-bottom: 5px; }
+        .event-info p { font-size: 0.8rem; color: #6b7280; margin-bottom: 15px; }
+        
+        .btn-card {
+            display: block;
+            width: 100%;
+            text-align: center;
+            border: 1px solid var(--text-dark);
+            padding: 8px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .btn-card:hover { background: var(--text-dark); color: white; }
+
+        /* --- Seção Central (Value Prop) --- */
+        .value-prop {
+            text-align: center;
+            padding: 80px 0;
+            font-family: 'Merriweather', serif;
+        }
+
+        .value-prop h2 {
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+
+        .value-prop p {
+            font-size: 1.2rem;
+            margin: 10px 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .text-minus { color: #93c5fd; }
+        .text-plus { color: var(--accent-green); font-weight: bold; }
+
+        /* --- Features (Grid Zigue-Zague) --- */
+        .feature-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            padding: 60px 0;
+        }
+
+        .feature-text small {
+            color: var(--accent-orange);
+            text-transform: uppercase;
+            font-weight: bold;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        .feature-text h2 {
+            font-family: 'Merriweather', serif;
+            font-size: 2rem;
+            margin: 10px 0 20px 0;
+            line-height: 1.3;
+        }
+
+        .feature-text p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .feature-mockup {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .mockup-img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            display: block;
+        }
+
+        /* --- Footer --- */
+        footer {
+            margin-top: auto;
+            background: rgb(255, 255, 255);
+            color: rgb(0, 0, 0);
+            padding: 60px 0 20px 0;
+            text-align: center;
+        }
+
+        .footer-logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 30px;
+            display: inline-block;
+            color: var(--primary-blue);
+        }
+        .footer-logo span { color: var(--accent-orange); }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .footer-links a { opacity: 0.7; transition: 0.3s; color: black; }
+        .footer-links a:hover { opacity: 1; color: var(--primary-blue); }
+
+        .copyright {
+            font-size: 0.8rem;
+            opacity: 0.5;
+            border-top: 1px solid rgba(0,0,0,0.1);
+            padding-top: 20px;
+        }
+
+        /* --- Responsividade --- */
+        @media (max-width: 900px) {
+            .hero { grid-template-columns: 1fr; text-align: center; margin-top: 100px; }
+            .hero-buttons { justify-content: center; }
+            .feature-row { grid-template-columns: 1fr; text-align: center; }
+            .feature-row.reverse .feature-text { order: 2; }
+            .feature-row.reverse .feature-mockup { order: 1; }
+            
+            .nav-links { display: none; }
+            .hamburger { display: block; }
+            
+            nav { padding: 15px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <nav>
+                <a href="index.html" class="logo">Compete<span>+</span></a>
+                
+                <div class="nav-links">
+                    <a href="index2.html" class="active">Início</a>
+                    <a href="eventosorganizador.html">Eventos</a>
+                    <a href="organizador.ts">Sou Organizador</a>
+                    <a href="orgperfil.html">Minha Conta</a>
+                    <a href="criarevento.html" class="btn-nav">Criar Evento →</a>
+                </div>
+
+                <div class="hamburger">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </nav>
+        </header>
+    </div>
+
+    <div class="container">
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Aqui, os eventos esportivos acontecem.</h1>
+                <p style="margin-bottom: 30px; opacity: 0.9;">Compete+, a plataforma completa para organizadores e atletas.</p>
+                
+                <div class="hero-buttons">
+                    <div class="role-card">
+                        <a href="./criarevento.html"><span><img src="./images/botao_criar_evento.png" alt="botão criar evento"></span></a>
+                    </div>
+                    <div class="role-card">
+                        <i class="fas fa-clipboard-user"></i>
+                        <a href="eventos.html"><span><img src="./images/botao_encontrar.png" alt="botão ecnontrar evento"></span></a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="hero-image">
+                <img src="./images/atletas.png" alt="Atletas correndo">
+            </div>
+        </section>
+    </div>
+
+    <div class="container">
+        <section class="events-section">
+            <div class="events-header">
+                <p>Atleta, encontre seu próximo desafio:</p>
+                <div class="filter-btn">Ver tudo ➝</div>
+            </div>
+
+            <div class="cards-container">
+                <article class="event-card">
+                    <div class="card-image-placeholder">
+                        <img src="./images/corrida.png" alt="Evento">
+                        <div class="date-badge">
+                            <div>20</div>
+                            <div>FEV</div>
+                        </div>
+                    </div>
+                    <div class="event-info">
+                        <h3>10ª Meia Maratona Rio Sul</h3>
+                        <p><i class="fas fa-map-marker-alt"></i> Rio de Janeiro / RJ</p>
+                        <a href="#" class="btn-card">Confira seu tempo</a>
+                    </div>
+                </article>
+
+                <article class="event-card">
+                    <div class="card-image-placeholder">
+                         <img src="./images/bike.png" alt="Evento">
+                        <div class="date-badge">
+                            <div>15</div>
+                            <div>AGO</div>
+                        </div>
+                    </div>
+                    <div class="event-info">
+                        <h3>Copa MTB Montanha 2024</h3>
+                        <p><i class="fas fa-map-marker-alt"></i> São Paulo / SP</p>
+                        <a href="#" class="btn-card">Inscreva-se agora</a>
+                    </div>
+                </article>
+
+                <article class="event-card">
+                    <div class="card-image-placeholder">
+                         <img src="./images/crossfit.png" alt="Evento">
+                        <div class="date-badge">
+                            <div>02</div>
+                            <div>SET</div>
+                        </div>
+                    </div>
+                    <div class="event-info">
+                        <h3>Desafio Crossfit Verão</h3>
+                        <p><i class="fas fa-map-marker-alt"></i> Salvador / BA</p>
+                        <a href="#" class="btn-card">Ver informações</a>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </div>
+
+    <div class="container">
+        <section class="value-prop">
+            <h2>Automatize a gestão das inscrições e<br>maximize o lucro do seu evento!</h2>
+            <p class="text-minus">- Trabalho operacional</p>
+            <p class="text-plus">+ Dinheiro no seu bolso</p>
+        </section>
+    </div>
+
+    <div class="container">
+        <section class="feature-row">
+            <div class="feature-text">
+                <small>Divulgação</small>
+                <h2>Página exclusiva para divulgação</h2>
+                <p>Centralize todas as informações da sua competição esportiva.</p>
+                <p>Tenha uma página online exclusiva para divulgar a sua prova.</p>
+            </div>
+            <div class="feature-mockup">
+                <img src="./images/mockup_seguranca.png.webp" class="mockup-img" alt="Página de Evento">
+            </div>
+        </section>
+    </div>
+
+    <div class="container">
+        <section class="feature-row reverse">
+            <div class="feature-mockup">
+                 <img src="./images/mockup_gestão.png.webp" class="mockup-img" alt="Dashboard">
+            </div>
+            <div class="feature-text">
+                <small>Gestão de Evento</small>
+                <h2>Gerencie as inscrições, pagamentos e check-ins de forma profissional</h2>
+                <p>Tenha controle total das vendas e inscrições. Crie multilotes e programe a data de virada deles.</p>
+                <p>Organize as inscrições e cupons de desconto ou cortesias.</p>
+            </div>
+        </section>
+    </div>
+
+    <div class="container">
+        <section class="feature-row">
+            <div class="feature-text">
+                <small>Gestão de Venda</small>
+                <h2>Venda por cartão, Pix ou boleto – sem complicação</h2>
+                <p>Realize todas as vendas e receba diretamente na Plataforma, sem precisar de outras integrações.</p>
+                <p>Aceite parcelamentos e receba o valor total de uma só vez!</p>
+            </div>
+            <div class="feature-mockup">
+                 <img src="./images/mockup_pagamentos.png.webp" class="mockup-img" alt="Pagamentos">
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-logo">Compete<span>+</span></div>
+            <div class="footer-links">
+                <a href="#">Serviços</a>
+                <a href="#">Conteúdo</a>
+                <a href="#">Contato</a>
+            </div>
+            <p class="copyright">2025 - Compete+ • Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        const hamburger = document.querySelector('.hamburger');
+        const navLinks = document.querySelector('.nav-links');
+
+        hamburger.addEventListener('click', () => {
+            if (navLinks.style.display === 'flex') {
+                navLinks.style.display = 'none';
+            } else {
+                navLinks.style.display = 'flex';
+                navLinks.style.flexDirection = 'column';
+                navLinks.style.position = 'absolute';
+                navLinks.style.top = '80px';
+                navLinks.style.right = '20px';
+                navLinks.style.background = 'white';
+                navLinks.style.padding = '20px';
+                navLinks.style.borderRadius = '20px';
+                navLinks.style.boxShadow = '0 10px 30px rgba(0,0,0,0.2)';
+                navLinks.style.width = '200px';
+            }
+        });
+
+        // Script de animação simples
+        window.addEventListener('scroll', reveal);
+
+        function reveal(){
+            var reveals = document.querySelectorAll('.feature-row, .event-card');
+
+            for(var i = 0; i < reveals.length; i++){
+                var windowheight = window.innerHeight;
+                var revealtop = reveals[i].getBoundingClientRect().top;
+                var revealpoint = 150;
+
+                if(revealtop < windowheight - revealpoint){
+                    reveals[i].style.opacity = '1';
+                    reveals[i].style.transform = 'translateY(0)';
+                }
+            }
+        }
+
+        document.querySelectorAll('.feature-row, .event-card').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(50px)';
+            el.style.transition = 'all 0.8s ease';
+        });
+        
+        reveal();
+    </script>
+</body>
+</html>
